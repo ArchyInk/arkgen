@@ -2,12 +2,12 @@
  * @author: Archy
  * @Date: 2022-01-28 15:49:38
  * @LastEditors: Archy
- * @LastEditTime: 2022-01-29 12:44:36
- * @FilePath: \code-generator\server\routes\users.js
+ * @LastEditTime: 2022-01-29 13:24:19
+ * @FilePath: \code-generator\server\src\routes\users.ts
  * @description:
  */
-var express = require('express')
-var router = express.Router()
+import express from 'express'
+const router = express.Router()
 const { readFileSync, writeFileSync } = require('fs-extra')
 
 router.get('/', function (req, res, next) { // eslint-disable-line
@@ -16,4 +16,4 @@ router.get('/', function (req, res, next) { // eslint-disable-line
   res.send(text)
 })
 
-module.exports = router
+export default router
