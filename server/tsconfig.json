@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "allowJs": true,
     "jsx": "preserve",
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext", "dom"]
   },
-  "include": ["src/**/*", "../index.js"]
+  "include": ["src/**/*"]
 }
