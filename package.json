@@ -8,7 +8,7 @@
     "web:build": "tsc -p ./react && vite build ./react",
     "server:dev": "tsc -p ./server --watch",
     "server:build": "tsc -p ./server",
-    "start:server": "hotnode ./server/bin/www",
+    "start:server": "node ./server/bin/www",
     "start:web": "npm run web:dev",
     "lint": "eslint ./{react,server}/src/**/*{.jsx,.js,.ts,.tsx}",
     "lint:fix": "eslint ./{react,server}/src/**/*{.jsx,.js,.ts,.tsx} --fix"
@@ -27,24 +27,33 @@
   },
   "homepage": "https://github.com/ArchyInk/code-generator#readme",
   "dependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "antd": "^4.18.5",
+    "axios": "^0.25.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "find-up": "5.0.0",
     "fs-extra": "^10.0.0",
     "morgan": "~1.9.1",
+    "qs": "^6.10.3",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "react-router-dom": "6",
+    "recoil": "^0.6.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.16.5",
     "@types/cookie-parser": "^1.4.2",
     "@types/express": "^4.17.13",
+    "@types/fs-extra": "^9.0.13",
     "@types/morgan": "^1.9.3",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
     "@vitejs/plugin-react": "^1.0.7",
+    "@vitejs/plugin-react-refresh": "^1.3.6",
     "babel-eslint": "^10.1.0",
     "eslint": "^8.8.0",
     "eslint-config-react-app": "^6.0.0",
@@ -53,6 +62,8 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "less": "^4.1.2",
+    "path": "^0.12.7",
     "typescript": "^4.4.4",
     "vite": "^2.7.2"
   }
