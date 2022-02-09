@@ -2,12 +2,13 @@
  * @Author: Archy
  * @Date: 2022-01-30 11:29:23
  * @LastEditors: Archy
- * @LastEditTime: 2022-01-30 22:11:34
+ * @LastEditTime: 2022-02-09 14:15:29
  * @FilePath: \arkgen\react\src\api\request.ts
  * @description:
  */
 import Axios from 'axios'
 import { notification } from 'antd'
+export type { AxiosPromise } from 'axios'
 
 export const request = Axios.create({
   baseURL: import.meta.env.VITE_API_URL as string,
@@ -19,12 +20,10 @@ request.interceptors.response.use(
     if (response.status === 200) {
       return data
     }
-
     notification.error({
       message: `请求错误 ${response.statusText}: ${response}`,
       description: data.msg || response.statusText || 'Error',
     })
-
     return Promise.reject(new Error(response.statusText || 'Error'))
   },
   (error) => {

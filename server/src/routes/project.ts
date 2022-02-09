@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-01-31 21:49:06
+ * @LastEditTime: 2022-02-09 17:14:19
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
@@ -32,7 +32,7 @@ router.get('/', async (req, res, next) => {
     if (pkgPath) {
       draft.hasPkg = true
       const pkg = readFileSync(pkgPath, 'utf-8')
-      draft.pkg = JSON.parse(pkg)
+      draft.pkg = pkg
     } else {
       draft.hasPkg = false
     }

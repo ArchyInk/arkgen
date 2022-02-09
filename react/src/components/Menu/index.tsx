@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-30 17:58:04
  * @LastEditors: Archy
- * @LastEditTime: 2022-01-31 11:17:54
+ * @LastEditTime: 2022-02-09 10:27:52
  * @FilePath: \arkgen\react\src\components\Menu\index.tsx
  * @description: 
  */
@@ -37,7 +37,7 @@ const SiderMenu: React.FC<SiderMenuProps> = (props) => {
           {renderMenuItemLink('首页', '/home')}
         </Menu.Item>
         <Menu.Item key="/project" icon={<FolderOpenFilled style={iconStyle} />}>
-          {renderMenuItemLink('项目结构', '/project')}
+          {renderMenuItemLink('项目', '/project')}
         </Menu.Item>
         <Menu.Item key="/generator" icon={<CodepenSquareFilled style={iconStyle} />}>
           {renderMenuItemLink('代码生成', '/generator')}

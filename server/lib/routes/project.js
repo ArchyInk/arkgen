@@ -43,7 +43,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-01-31 21:49:06
+ * @LastEditTime: 2022-02-09 17:14:19
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
@@ -73,7 +73,7 @@ router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, voi
                 if (pkgPath) {
                     draft.hasPkg = true;
                     pkg = (0, fs_extra_1.readFileSync)(pkgPath, 'utf-8');
-                    draft.pkg = JSON.parse(pkg);
+                    draft.pkg = pkg;
                 }
                 else {
                     draft.hasPkg = false;
