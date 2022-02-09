@@ -43,20 +43,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-09 17:14:19
+ * @LastEditTime: 2022-02-09 23:17:48
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
 var express_1 = __importDefault(require("express"));
 var fs_extra_1 = require("fs-extra");
 var path_1 = require("path");
-var find_up_1 = __importDefault(require("find-up"));
+var utils_1 = require("../shared/utils");
 var constants_1 = require("../shared/constants");
 var Response_1 = __importDefault(require("../class/Response"));
-var utils_1 = require("../shared/utils");
+var utils_2 = require("../shared/utils");
 var router = express_1.default.Router();
 router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var resp, draft, pkgPath, pkg, err_1;
+    var resp, draft, findPkg, findViteConfig, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -64,31 +64,58 @@ router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, voi
                 draft = {
                     path: constants_1.CWD,
                 };
+                findPkg = function () { return __awaiter(void 0, void 0, void 0, function () {
+                    var pkgPath, pkg;
+                    return __generator(this, function (_a) {
+                        pkgPath = (0, utils_1.findFileAsync)('package.json');
+                        if (pkgPath) {
+                            draft.hasPkg = true;
+                            pkg = (0, fs_extra_1.readFileSync)(pkgPath, 'utf-8');
+                            draft.pkg = pkg;
+                        }
+                        else {
+                            draft.hasPkg = false;
+                        }
+                        return [2 /*return*/];
+                    });
+                }); };
+                findViteConfig = function () { return __awaiter(void 0, void 0, void 0, function () {
+                    var vitePath, viteConfig;
+                    return __generator(this, function (_a) {
+                        vitePath = (0, utils_1.findFileAsync)('vite.config.(js|ts)', {
+                            include: ['react', 'server'],
+                        });
+                        console.log('vitePath');
+                        console.log(vitePath);
+                        if (vitePath) {
+                            draft.hasViteConfig = true;
+                            viteConfig = (0, fs_extra_1.readFileSync)(vitePath, 'utf-8');
+                            draft.viteConfig = viteConfig;
+                        }
+                        else {
+                            draft.hasViteConfig = false;
+                        }
+                        return [2 /*return*/];
+                    });
+                }); };
                 _a.label = 1;
             case 1:
-                _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, (0, find_up_1.default)('package.json')];
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, findPkg()];
             case 2:
-                pkgPath = _a.sent();
-                if (pkgPath) {
-                    draft.hasPkg = true;
-                    pkg = (0, fs_extra_1.readFileSync)(pkgPath, 'utf-8');
-                    draft.pkg = pkg;
-                }
-                else {
-                    draft.hasPkg = false;
-                }
-                draft.dirs = (0, utils_1.dirDetail)(constants_1.CWD);
-                resp.success = true;
-                resp.msg = '获取项目详情成功！';
-                resp.data = draft;
-                return [3 /*break*/, 4];
+                _a.sent();
+                return [4 /*yield*/, findViteConfig()];
             case 3:
-                err_1 = _a.sent();
-                resp.success = false;
-                resp.msg = err_1;
-                return [3 /*break*/, 4];
+                _a.sent();
+                draft.dirs = (0, utils_2.dirDetail)(constants_1.CWD);
+                resp.setRes('获取项目详情成功！', true, draft);
+                return [3 /*break*/, 5];
             case 4:
+                err_1 = _a.sent();
+                console.error(err_1);
+                resp.setRes(err_1);
+                return [3 /*break*/, 5];
+            case 5:
                 res.send(resp.toRes());
                 return [2 /*return*/];
         }
@@ -101,23 +128,21 @@ router.post('/dir', function (req, res, next) {
         var _dirname_1 = (0, path_1.join)(constants_1.CWD, dirName);
         if ((0, fs_extra_1.lstatSync)(_dirname_1).isDirectory()) {
             try {
-                resp.data = (0, fs_extra_1.readdirSync)(_dirname_1).map(function (item) { return ({
+                resp.setRes('获取目录下文件成功!', true, (0, fs_extra_1.readdirSync)(_dirname_1).map(function (item) { return ({
                     name: item,
                     isDir: (0, fs_extra_1.lstatSync)((0, path_1.join)(_dirname_1, item)).isDirectory(),
-                }); });
-                resp.success = true;
-                resp.msg = '获取目录下文件成功';
+                }); }));
             }
             catch (err) {
-                resp.msg = err;
+                resp.setRes(err);
             }
         }
         else {
-            resp.msg = "".concat(dirName, " \u4E0D\u662F\u4E00\u4E2A\u76EE\u5F55");
+            resp.setRes("".concat(dirName, " \u4E0D\u662F\u4E00\u4E2A\u76EE\u5F55"));
         }
     }
     else {
-        resp.msg = 'dirName 为必传参数!';
+        resp.setRes('dirName 为必传参数!');
     }
     res.send(resp.toRes());
 });

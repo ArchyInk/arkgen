@@ -7,11 +7,12 @@ export default class Resp {
     get msg(): string;
     set data(data: any);
     get data(): any;
-    get success(): Boolean;
-    set success(success: Boolean);
+    get success(): boolean;
+    set success(success: boolean);
     toRes(): {
         msg: string;
-        success: Boolean;
+        success: boolean;
         data: any;
     };
+    setRes(msg: string, success?: boolean, data?: any): void;
 }

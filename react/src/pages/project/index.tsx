@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-30 20:30:41
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-09 17:34:07
+ * @LastEditTime: 2022-02-09 21:41:13
  * @FilePath: \arkgen\react\src\pages\project\index.tsx
  * @description: 
  */
@@ -13,7 +13,6 @@ import SyntaxHighlighter from 'react-syntax-highlighter'
 import { atelierEstuaryLight } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
 import './index.less'
-import { Route } from "react-router-dom";
 const Project: React.FC = () => {
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>()
 
@@ -53,14 +52,18 @@ const Project: React.FC = () => {
   }
 
   const renderLeft = () => {
-    return (<div>left</div>)
+    return (
+      <div>
+
+
+    </div>)
   }
 
   const renderRight = () => {
     return (
       <div style={{ height: '100%', width: '100%' }}>
         <SyntaxHighlighter language="javascript" style={atelierEstuaryLight} customStyle={{ height: '100%' }} showLineNumbers wrapLongLines >
-          {projectInfo ? projectInfo.pkg : '为获取到pkg'}
+          {projectInfo ? projectInfo.pkg : '未获取到pkg'}
         </SyntaxHighlighter>
       </div>
     )

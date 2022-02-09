@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @Author: Archy
  * @Date: 2022-01-31 16:51:10
  * @LastEditors: Archy
- * @LastEditTime: 2022-01-31 17:16:43
+ * @LastEditTime: 2022-02-09 21:36:44
  * @FilePath: \arkgen\server\src\class\Response.ts
  * @description:
  */
@@ -54,6 +54,11 @@ var Resp = /** @class */ (function () {
         draft.success = this._success;
         draft.data = this._data;
         return draft;
+    };
+    Resp.prototype.setRes = function (msg, success, data) {
+        this._success = success ? success : false;
+        this._msg = msg;
+        this._data = data ? data : {};
     };
     return Resp;
 }());
