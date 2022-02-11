@@ -2,17 +2,21 @@
  * @Author: Archy
  * @Date: 2022-01-31 16:51:10
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-09 21:36:44
+ * @LastEditTime: 2022-02-11 17:10:30
  * @FilePath: \arkgen\server\src\class\Response.ts
  * @description:
  */
-export default class Resp {
+export type ResponseType<T> = {
+  msg: string,
+  data: T,
+  success: boolean
+}
+export default class Resp<T> {
   private _msg: string
-  private _data: any
+  private _data: T
   private _success: boolean
   constructor() {
     this._success = false
-    this._data = {}
     this._msg = ''
   }
 
@@ -24,7 +28,7 @@ export default class Resp {
     return this._msg
   }
 
-  set data(data: any) {
+  set data(data: T) {
     this._data = data
   }
 
@@ -40,11 +44,11 @@ export default class Resp {
     this._success = success
   }
 
-  toRes() {
-    const draft: { msg: string; success: boolean; data: any } = {
+  toRes(): ResponseType<T> {
+    const draft: ResponseType<T> = {
       success: false,
-      data: {},
       msg: '',
+      data: undefined,
     }
     draft.msg = this._msg
     draft.success = this._success
@@ -52,9 +56,9 @@ export default class Resp {
     return draft
   }
 
-  setRes(msg: string, success?: boolean, data?: any) {
-    this._success = success ? success : false
+  setRes(msg: string, success?: boolean, data?: T) {
     this._msg = msg
-    this._data = data ? data : {}
+    this._success = success ? success : false
+    this._data = data ? data : undefined
   }
 }

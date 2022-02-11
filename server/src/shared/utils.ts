@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-09 23:36:17
+ * @LastEditTime: 2022-02-11 15:20:25
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -13,12 +13,39 @@ import {
   constants,
   statSync,
   readdirSync,
+  Stats,
 } from 'fs-extra'
 import { join } from 'path'
 import { CWD } from './constants'
 import nm from 'nanomatch'
+export type DirType = {
+  title: string,
+  type: 'directory' | 'file' | 'unknown' | 'error',
+  key: number,
+  isLeaf: boolean,
+  info?: Stats,
+  err?: Error
+}
+
+/**
+ * @description: 判断路径是否为目录
+ * @param {string} path
+ * @return {boolean} 
+ */
 export const isDir = (path: string): boolean => lstatSync(path).isDirectory()
+
+/**
+ * @description: 判断路径是否为文件
+ * @param {string} path
+ * @return {boolean} 
+ */
 export const isFile = (path: string): boolean => lstatSync(path).isFile()
+
+/**
+ * @description: 判断路径是否存在
+ * @param {string} path
+ * @return {boolean}
+ */
 export const isExist = (path: string): boolean => {
   try {
     accessSync(path, constants.F_OK)
@@ -27,72 +54,109 @@ export const isExist = (path: string): boolean => {
     return false
   }
 }
-export const fileType = (path: string) =>
+
+/**
+ * @description: 判断路径类型
+ * @param {string} path
+ * @return {'directory' | 'file' | 'unknown'}
+ */
+export const pathType = (path: string): 'directory' | 'file' | 'unknown' =>
   isDir(path) ? 'directory' : isFile(path) ? 'file' : 'unknown'
 
-export const dirDetail = (path: string) => {
+/**
+ * @description: 目录详情，获取目录下所有路径的详情
+ * @param {string} path
+ * @return {DirsType}
+ */
+export const dirDetail = (path: string): DirType[] => {
   const names = readdirSync(path)
-  const resArr = []
+  const resArr: DirType[] = []
   for (let name of names) {
     const res = statSync(join(path, name))
     try {
       resArr.push({
-        name,
+        title: name,
+        key: res.ino,
         type: res.isDirectory()
           ? 'directory'
           : res.isFile()
-          ? 'file'
-          : 'unknown',
+            ? 'file'
+            : 'unknown',
+        isLeaf: res.isFile() ? true : false,
         info: res,
       })
     } catch (err) {
       resArr.push({
-        name,
+        title: name,
+        key: Math.random(),
+        type: 'error',
+        isLeaf: true,
         err,
       })
     }
   }
-  return resArr
+  return resArr.sort((a, b) => {
+    const typeToNum = (item: DirType) => {
+      return item.type === 'directory' ? 3 : item.type === 'file' ? 2 : item.type === 'unknown' ? 1 : -1
+    }
+    return typeToNum(b) - typeToNum(a)
+  })
 }
 
-export const findFileAsync = (
-  filename: string,
-  options?: { exclude?: string[]; include?: string[]; cwd?: string }
-) => {
+
+/**
+ * @description: 向下查找文件
+ * @param {string} filename 文件名,支持通配符
+ * @param {{ exclude?: string[]; include?: string[]; cwd?: string }} options exclude 排除的文件夹 include包括的文件夹 cwd搜索的根目录，默认为项目根目录
+ * @return {string} 
+ */
+export const findFileAsync = (filename: string, options?: { exclude?: string[]; include?: string[]; cwd?: string }): string => {
   const _cwd = options?.cwd ? options?.cwd : CWD
-  const _include = options?.include
-  const _exclude = options?.exclude
+  const include = options?.include
+  const exclude = options?.exclude
+  let _include = include
   const find = (dirPath: string) => {
-    const filePath = join(dirPath, filename)
     let names = readdirSync(dirPath)
-    if (_include) {
-      let draft = []
-      for (let inc of _include) {
-        const matchs = nm.match(names, inc)
-        draft = draft.concat(nm.match(names, inc))
-      }
-      names = draft
-    }
-
-    if (options?.exclude) {
-      for (let exc of options.exclude) {
-        names = nm.not(names, exc)
-      }
-    }
-
+    let _names = names
     for (let name of names) {
       const path = join(dirPath, name)
-      console.log(filename)
-      console.log(name)
-      console.log(nm.isMatch(name, filename))
-      if (isFile(path) && nm.isMatch(name, filename)) {
-        return path
+      if (exclude) {
+        for (let exc of exclude) {
+          if (nm.isMatch(path, join(_cwd, exc))) {
+            _names = _names.filter((item) => item !== name)
+            continue
+          }
+        }
+      }
+      if (_include && _include.length > 0) {
+        for (let inc of _include) {
+          const draft = []
+          if (nm.isMatch(path, join(_cwd, inc))) {
+            draft.push(name)
+            _include = _include.filter((item) => item !== inc)
+            _names = draft
+            if (isFile(path) && nm.isMatch(path, join(dirPath, filename))) {
+              return path
+            } else {
+              continue
+            }
+          }
+        }
+      } else {
+        if (isFile(path) && nm.isMatch(name, filename)) {
+          return path
+        }
       }
     }
 
-    for (let name of names) {
+    for (let name of _names) {
       const path = join(dirPath, name)
-      isDir(path) && find(path)
+      if (isDir(path)) {
+        const p = find(path)
+        if (p) {
+          return find(path)
+        }
+      }
     }
   }
   return find(_cwd)

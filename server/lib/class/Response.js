@@ -1,17 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/*
- * @Author: Archy
- * @Date: 2022-01-31 16:51:10
- * @LastEditors: Archy
- * @LastEditTime: 2022-02-09 21:36:44
- * @FilePath: \arkgen\server\src\class\Response.ts
- * @description:
- */
 var Resp = /** @class */ (function () {
     function Resp() {
         this._success = false;
-        this._data = {};
         this._msg = '';
     }
     Object.defineProperty(Resp.prototype, "msg", {
@@ -47,8 +38,8 @@ var Resp = /** @class */ (function () {
     Resp.prototype.toRes = function () {
         var draft = {
             success: false,
-            data: {},
             msg: '',
+            data: undefined,
         };
         draft.msg = this._msg;
         draft.success = this._success;
@@ -56,9 +47,9 @@ var Resp = /** @class */ (function () {
         return draft;
     };
     Resp.prototype.setRes = function (msg, success, data) {
-        this._success = success ? success : false;
         this._msg = msg;
-        this._data = data ? data : {};
+        this._success = success ? success : false;
+        this._data = data ? data : undefined;
     };
     return Resp;
 }());

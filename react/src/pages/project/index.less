@@ -1,24 +1,48 @@
 .arkgen__header {
   width: 100%;
   height: 3rem;
-  font-size: 2rem;
   padding: 0 0.5rem;
   display: flex;
-  align-items: center;
   justify-content: flex-start;
+  align-items: center;
   font-weight: bolder;
-  background-color: white;
-  border-bottom:1px solid #eaecef;
+  background: white !important;
+  border-bottom: 1px solid #f0f0f0;
+  border-top: 1px solid #f0f0f0;
+
   &.header--no-pkg {
     font-size: 1rem;
     font-weight: normal;
     color: #f1939c;
   }
 
-  .header__version {
-    font-size: 1rem;
-    font-weight: normal;
-    margin-left: 0.25rem;
-    color: darkgrey;
+
+
+  .header__project {
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+
+    .project__info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-left: 0.25rem;
+      font-size: 1rem;
+      font-weight: normal;
+      color: darkgrey;
+      line-height: 1rem;
+    }
   }
+}
+
+.ant-tree.ant-tree-directory .ant-tree-treenode-selected:hover::before,
+.ant-tree.ant-tree-directory .ant-tree-treenode-selected::before {
+  background: fade(#8cbcd1, 70%);
+}
+
+.ant-tree {
+  background: transparent;
 }

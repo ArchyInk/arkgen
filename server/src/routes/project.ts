@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-09 23:17:48
+ * @LastEditTime: 2022-02-11 17:13:53
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
@@ -15,21 +15,33 @@ import {
   constants,
 } from 'fs-extra'
 import { join } from 'path'
-import { findFileAsync } from '../shared/utils'
+import findUp from 'find-up'
 import { CWD } from '../shared/constants'
 import Resp from '../class/Response'
 import { dirDetail } from '../shared/utils'
+import { DirType } from '../shared/utils'
 const router = express.Router()
+
+export type ProjectInfoType = {
+  path: string,
+  dirs: DirType[],
+  hasPkg?: boolean,
+  pkg?: string,
+  hasViteConfig?: boolean,
+  viteConfig?: string,
+
+}
 
 router.get('/', async (req, res, next) => {
   // eslint-disable-line
-  const resp = new Resp()
-  const draft: Record<string, any> = {
+  const resp = new Resp<ProjectInfoType>()
+  const draft: ProjectInfoType = {
     path: CWD,
+    dirs: []
   }
 
   const findPkg = async () => {
-    const pkgPath = findFileAsync('package.json')
+    const pkgPath = await findUp('package.json')
     if (pkgPath) {
       draft.hasPkg = true
       const pkg = readFileSync(pkgPath, 'utf-8')
@@ -40,11 +52,7 @@ router.get('/', async (req, res, next) => {
   }
 
   const findViteConfig = async () => {
-    const vitePath = findFileAsync('vite.config.(js|ts)', {
-      include: ['react', 'server'],
-    })
-    console.log('vitePath');
-    console.log(vitePath);
+    const vitePath = await findUp(['vite.config.ts', 'vite.config.js'])
     if (vitePath) {
       draft.hasViteConfig = true
       const viteConfig = readFileSync(vitePath, 'utf-8')
@@ -60,7 +68,6 @@ router.get('/', async (req, res, next) => {
     draft.dirs = dirDetail(CWD)
     resp.setRes('获取项目详情成功！', true, draft)
   } catch (err) {
-    console.error(err)
     resp.setRes(err)
   }
   res.send(resp.toRes())
