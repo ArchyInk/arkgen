@@ -1,4 +1,4 @@
-import { DirType } from '../shared/utils';
+import { DirType } from '../../../types/server';
 declare const router: import("express-serve-static-core").Router;
 export declare type ProjectInfoType = {
     path: string;

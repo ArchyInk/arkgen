@@ -1,9 +1,11 @@
 .arkgen-layout {
   height: calc(100vh - 24px);
   overflow: hidden;
-  border-radius: 20px;
+  border: 2px solid #233333;
+
   .ant-layout-sider-light {
-    background: linear-gradient(#8abcd1, #f2cac9);
+    background: white;
+    border-right: 2px solid #233333;
   }
 
   .ant-menu {
@@ -11,7 +13,8 @@
     border-right: none;
 
     .ant-menu-item {
-      filter: blur(2px);
+      background-color: unset;
+
 
       &::after {
         border: none;
@@ -19,27 +22,29 @@
     }
 
     .ant-menu-item-selected {
-      filter: none;
       background-color: unset;
-      color: white
+      text-decoration: underline;
+
+      .ant-menu-item-icon {
+        color: #233333 !important;
+      }
+
     }
 
     &.sidermenu--collapsed {
       .ant-menu-item {
         filter: unset;
+
         &::after {
           border: none;
         }
       }
     }
 
-      .sidermenu__item {
-        color: white;
-        font-family: 'Courier New', Courier, monospace;
-      }
+    .sidermenu__item {
+      color: #233333;
+      font-family: fangsong, 'Courier New', Courier, monospace;
+      font-weight: bolder;
+    }
   }
-}
-
-.ant-layout{
-  background-image: url(../assets/texture.png) ;
 }

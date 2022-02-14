@@ -43,13 +43,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-11 17:13:53
+ * @LastEditTime: 2022-02-14 16:16:58
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
 var express_1 = __importDefault(require("express"));
 var fs_extra_1 = require("fs-extra");
-var path_1 = require("path");
 var find_up_1 = __importDefault(require("find-up"));
 var constants_1 = require("../shared/constants");
 var Response_1 = __importDefault(require("../class/Response"));
@@ -125,28 +124,28 @@ router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, voi
         }
     });
 }); });
-router.post('/dir', function (req, res, next) {
-    var dirName = req.body.dirName;
+router.get('/dir', function (req, res, next) {
+    var path = req.query.path;
     var resp = new Response_1.default();
-    if (dirName) {
-        var _dirname_1 = (0, path_1.join)(constants_1.CWD, dirName);
-        if ((0, fs_extra_1.lstatSync)(_dirname_1).isDirectory()) {
-            try {
-                resp.setRes('获取目录下文件成功!', true, (0, fs_extra_1.readdirSync)(_dirname_1).map(function (item) { return ({
-                    name: item,
-                    isDir: (0, fs_extra_1.lstatSync)((0, path_1.join)(_dirname_1, item)).isDirectory(),
-                }); }));
+    if (typeof path === 'string') {
+        try {
+            var lstat = (0, fs_extra_1.lstatSync)(path);
+            if (lstat.isDirectory()) {
+                resp.setRes('获取目录详情成功', true, (0, utils_1.dirDetail)(path));
             }
-            catch (err) {
-                resp.setRes(err);
+            else {
+                resp.setRes("".concat(path, " \u4E0D\u662F\u4E00\u4E2A\u76EE\u5F55"));
             }
         }
-        else {
-            resp.setRes("".concat(dirName, " \u4E0D\u662F\u4E00\u4E2A\u76EE\u5F55"));
+        catch (err) {
+            resp.setRes("".concat(err));
         }
     }
+    else if (path === undefined) {
+        resp.setRes('path 为必传参数!');
+    }
     else {
-        resp.setRes('dirName 为必传参数!');
+        resp.setRes('path 类型必须为string!');
     }
     res.send(resp.toRes());
 });

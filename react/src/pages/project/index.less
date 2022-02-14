@@ -13,7 +13,6 @@
   &.header--no-pkg {
     font-size: 1rem;
     font-weight: normal;
-    color: #f1939c;
   }
 
 
@@ -29,7 +28,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      margin-left: 0.25rem;
+      margin-left: 0.5rem;
       font-size: 1rem;
       font-weight: normal;
       color: darkgrey;
@@ -40,8 +39,14 @@
 
 .ant-tree.ant-tree-directory .ant-tree-treenode-selected:hover::before,
 .ant-tree.ant-tree-directory .ant-tree-treenode-selected::before {
-  background: fade(#8cbcd1, 70%);
+  background: unset;
+  border-bottom: 1px solid #233333;
 }
+
+.ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected,.ant-tree.ant-tree-directory .ant-tree-treenode-selected .ant-tree-switcher {
+  color: black;
+}
+
 
 .ant-tree {
   background: transparent;

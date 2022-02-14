@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-30 09:16:43
  * @LastEditors: Archy
- * @LastEditTime: 2022-01-31 11:24:36
+ * @LastEditTime: 2022-02-14 11:55:55
  * @FilePath: \arkgen\react\src\layouts\BasicLayout.tsx
  * @description: 
  */
@@ -19,7 +19,7 @@ const BasicLayout: React.FC = () => {
   const [width, setWidth] = useState(64)
   const [collapsed,setCollapsed] = useState(false)
   const handleMouseenter = () => {
-    setWidth(128)
+    setWidth(168)
     setCollapsed(true)
   }
 

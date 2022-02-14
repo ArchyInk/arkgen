@@ -1,13 +1,4 @@
-/// <reference types="node" />
-import { Stats } from 'fs-extra';
-export declare type DirType = {
-    title: string;
-    type: 'directory' | 'file' | 'unknown' | 'error';
-    key: number;
-    isLeaf: boolean;
-    info?: Stats;
-    err?: Error;
-};
+import { DirType } from '../../../types/server';
 /**
  * @description: 判断路径是否为目录
  * @param {string} path

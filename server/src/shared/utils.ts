@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-11 15:20:25
+ * @LastEditTime: 2022-02-14 16:15:27
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -15,17 +15,11 @@ import {
   readdirSync,
   Stats,
 } from 'fs-extra'
+import { DirType } from '../../../types/server'
 import { join } from 'path'
 import { CWD } from './constants'
 import nm from 'nanomatch'
-export type DirType = {
-  title: string,
-  type: 'directory' | 'file' | 'unknown' | 'error',
-  key: number,
-  isLeaf: boolean,
-  info?: Stats,
-  err?: Error
-}
+
 
 /**
  * @description: 判断路径是否为目录
@@ -76,7 +70,7 @@ export const dirDetail = (path: string): DirType[] => {
     try {
       resArr.push({
         title: name,
-        key: res.ino,
+        key: join(path, name),
         type: res.isDirectory()
           ? 'directory'
           : res.isFile()
@@ -88,7 +82,7 @@ export const dirDetail = (path: string): DirType[] => {
     } catch (err) {
       resArr.push({
         title: name,
-        key: Math.random(),
+        key: join(path, name),
         type: 'error',
         isLeaf: true,
         err,

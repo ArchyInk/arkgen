@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-11 17:13:53
+ * @LastEditTime: 2022-02-14 16:16:58
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
@@ -19,7 +19,7 @@ import findUp from 'find-up'
 import { CWD } from '../shared/constants'
 import Resp from '../class/Response'
 import { dirDetail } from '../shared/utils'
-import { DirType } from '../shared/utils'
+import { DirType } from '../../../types/server'
 const router = express.Router()
 
 export type ProjectInfoType = {
@@ -29,7 +29,6 @@ export type ProjectInfoType = {
   pkg?: string,
   hasViteConfig?: boolean,
   viteConfig?: string,
-
 }
 
 router.get('/', async (req, res, next) => {
@@ -73,30 +72,26 @@ router.get('/', async (req, res, next) => {
   res.send(resp.toRes())
 })
 
-router.post('/dir', function (req, res, next) {
-  const { dirName } = req.body
+router.get('/dir', function (req, res, next) {
+  const { path } = req.query
   const resp = new Resp()
-  if (dirName) {
-    const _dirname = join(CWD, dirName)
-    if (lstatSync(_dirname).isDirectory()) {
-      try {
-        resp.setRes(
-          '获取目录下文件成功!',
-          true,
-          readdirSync(_dirname).map((item) => ({
-            name: item,
-            isDir: lstatSync(join(_dirname, item)).isDirectory(),
-          }))
-        )
-      } catch (err) {
-        resp.setRes(err)
+  if (typeof path === 'string') {
+    try {
+      const lstat = lstatSync(path)
+      if (lstat.isDirectory()) {
+        resp.setRes('获取目录详情成功', true, dirDetail(path))
+      } else {
+        resp.setRes(`${path} 不是一个目录`)
       }
-    } else {
-      resp.setRes(`${dirName} 不是一个目录`)
+    } catch (err) {
+      resp.setRes(`${err}`)
     }
+  } else if (path === undefined) {
+    resp.setRes('path 为必传参数!')
   } else {
-    resp.setRes('dirName 为必传参数!')
+    resp.setRes('path 类型必须为string!')
   }
+
   res.send(resp.toRes())
 })
 

@@ -3,7 +3,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-11 15:20:25
+ * @LastEditTime: 2022-02-14 16:15:27
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -81,7 +81,7 @@ var dirDetail = function (path) {
             try {
                 resArr.push({
                     title: name_1,
-                    key: res.ino,
+                    key: (0, path_1.join)(path, name_1),
                     type: res.isDirectory()
                         ? 'directory'
                         : res.isFile()
@@ -94,7 +94,7 @@ var dirDetail = function (path) {
             catch (err) {
                 resArr.push({
                     title: name_1,
-                    key: Math.random(),
+                    key: (0, path_1.join)(path, name_1),
                     type: 'error',
                     isLeaf: true,
                     err: err,

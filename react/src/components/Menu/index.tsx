@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-30 17:58:04
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-09 10:27:52
+ * @LastEditTime: 2022-02-14 14:51:46
  * @FilePath: \arkgen\react\src\components\Menu\index.tsx
  * @description: 
  */
@@ -24,7 +24,7 @@ const SiderMenu: React.FC<SiderMenuProps> = (props) => {
     return (<Link to={to} className='sidermenu__item'>{props.collapsed ? title : ''}</Link>)
   }
 
-  const iconStyle = { color: 'white', fontSize: '20px' }
+  const iconStyle = { color: '#777777', fontSize: '18px' }
   useEffect(() => {
     setSelectedKeys([location.pathname])
   }, [location])
