@@ -2,15 +2,15 @@
  * @Author: Archy
  * @Date: 2022-01-30 20:30:41
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-14 17:05:38
+ * @LastEditTime: 2022-02-16 17:29:16
  * @FilePath: \arkgen\react\src\pages\project\index.tsx
  * @description: 
  */
 import React, { useState, useEffect, ReactNode } from "react";
-import { notification, Row, Col, Tree, Card } from "antd";
+import { notification, Row, Col, Tree, Card, Descriptions } from "antd";
 import { getProjectInfo, ProjectInfo, getDir, DirType } from "../../api/project";
 import SyntaxHighlighter from 'react-syntax-highlighter'
-import { atelierCaveLight } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import { vs2015 } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 const { DirectoryTree } = Tree
 
 import './index.less'
@@ -32,33 +32,42 @@ const Project: React.FC = () => {
     handleProjectInfo()
   }, [])
 
-  const renderHeader = () => {
+  const renderProjectCard = () => {
+    const cardStyle: React.CSSProperties = { marginBottom: '8px' }
     if (projectInfo) {
       return (
-        <header className='arkgen__header'>
-          {projectInfo.hasPkg ?
-            <div className="header__project">
-              {JSON.parse(projectInfo.pkg).name}
-              <div className="project__info">
-                <div >version:{JSON.parse(projectInfo.pkg).version}</div>
-                <div >description:{JSON.parse(projectInfo.pkg).description}</div>
-              </div>
-            </div> :
-            projectInfo.path
-          }
-        </header>
+        <Card title="项目详情" headStyle={cardHeaderStyle} style={cardStyle}>
+          <Descriptions>
+            {projectInfo.hasPkg ?
+              <>
+                <Descriptions.Item label="名称">{JSON.parse(projectInfo.pkg).name}</Descriptions.Item>
+                <Descriptions.Item label="版本">{JSON.parse(projectInfo.pkg).version}</Descriptions.Item>
+                <Descriptions.Item label="描述">{JSON.parse(projectInfo.pkg).description}</Descriptions.Item>
+                <Descriptions.Item label="作者">{JSON.parse(projectInfo.pkg).author}</Descriptions.Item>
+                <Descriptions.Item label="授权">{JSON.parse(projectInfo.pkg).license} </Descriptions.Item>
+              </>
+              :
+              <>
+                <Descriptions.Item label="路径">{projectInfo.path}</Descriptions.Item>
+                <Descriptions.Item>未找到package.json文件</Descriptions.Item>
+              </>
+            }
+
+          </Descriptions>
+        </Card>
       )
     } else {
-      return (<header className={`arkgen__header header--no-pkg`}>未获取到项目信息</header>)
+      return (<Card title="项目详情" headStyle={cardHeaderStyle} style={cardStyle}>未获取到项目</Card>)
     }
   }
 
   const renderLeftBody = () => {
-    const rowStyle: React.CSSProperties = { padding: 8, paddingRight: 0, height: 'calc(100% - 3rem)' }
+    const rowStyle: React.CSSProperties = { padding: 8, paddingRight: 0, height: '100%' }
     const fullHeightStyle: React.CSSProperties = { height: '100%' }
     return (
       < Row style={rowStyle} gutter={8}>
         <Col span={16}>
+          {renderProjectCard()}
           {renderTaskList()}
           {renderDependenciesList()}
         </Col>
@@ -115,11 +124,15 @@ const Project: React.FC = () => {
         return <span>{nodeData.title}</span>
       }
     }
+
+    const onSelect = (key: (string | number)[], { node }: any) => {
+    }
+
     const cardStyle: React.CSSProperties = { height: '100%' }
-    const bodyStyle: React.CSSProperties = { height: 'calc(100% - 3rem)', overflow: 'auto' }
+    const bodyStyle: React.CSSProperties = { height: '100%', overflow: 'auto' }
     return (
       <Card title="项目结构" style={cardStyle} headStyle={cardHeaderStyle} bodyStyle={bodyStyle}>
-        <DirectoryTree treeData={dirs} loadData={onLoadData} titleRender={customRender}></DirectoryTree>
+        <DirectoryTree treeData={dirs} loadData={onLoadData} titleRender={customRender} onSelect={onSelect}></DirectoryTree>
       </Card>
     )
   }
@@ -144,20 +157,19 @@ const Project: React.FC = () => {
   const renderLeft = () => {
     return (
       <>
-        {renderHeader()}
         {renderLeftBody()}
       </>)
   }
 
   const renderRight = () => {
     const divStyle: React.CSSProperties = { height: '100%', width: '100%' }
-    const customStyle: React.CSSProperties = { height: '100%', background: 'white' }
+    const customStyle: React.CSSProperties = { height: '100%' }
     const switchLanguage = () => {
 
     }
     return (
       <div style={divStyle}>
-        <SyntaxHighlighter language="json" style={atelierCaveLight} customStyle={customStyle} showLineNumbers wrapLongLines >
+        <SyntaxHighlighter language="json" style={vs2015} customStyle={customStyle} showLineNumbers wrapLongLines >
           {projectInfo ? projectInfo.pkg : '未获取到pkg'}
         </SyntaxHighlighter>
       </div>
@@ -166,7 +178,7 @@ const Project: React.FC = () => {
 
   const renderAll = () => {
     const fullHeightStyle: React.CSSProperties = { height: '100%' }
-    const colLeftStyle: React.CSSProperties = { height: '100%', overflow: 'auto' }
+    const colLeftStyle: React.CSSProperties = { height: '100%' }
     const colRightStyle: React.CSSProperties = { height: '100%', overflow: 'auto' }
     return (
       <div style={fullHeightStyle}>
