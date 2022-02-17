@@ -43,7 +43,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-14 16:16:58
+ * @LastEditTime: 2022-02-17 11:44:20
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
@@ -55,9 +55,9 @@ var Response_1 = __importDefault(require("../class/Response"));
 var utils_1 = require("../shared/utils");
 var router = express_1.default.Router();
 router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var resp, draft, findPkg, findViteConfig, err_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var resp, draft, findPkg, findViteConfig, _a, err_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
                 resp = new Response_1.default();
                 draft = {
@@ -102,51 +102,73 @@ router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, voi
                         }
                     });
                 }); };
-                _a.label = 1;
+                _b.label = 1;
             case 1:
-                _a.trys.push([1, 4, , 5]);
+                _b.trys.push([1, 5, , 6]);
                 return [4 /*yield*/, findPkg()];
             case 2:
-                _a.sent();
+                _b.sent();
                 return [4 /*yield*/, findViteConfig()];
             case 3:
-                _a.sent();
-                draft.dirs = (0, utils_1.dirDetail)(constants_1.CWD);
-                resp.setRes('获取项目详情成功！', true, draft);
-                return [3 /*break*/, 5];
+                _b.sent();
+                _a = draft;
+                return [4 /*yield*/, (0, utils_1.dirDetail)(constants_1.CWD)];
             case 4:
-                err_1 = _a.sent();
-                resp.setRes(err_1);
-                return [3 /*break*/, 5];
+                _a.dirs = _b.sent();
+                resp.setRes('获取项目详情成功！', true, draft);
+                return [3 /*break*/, 6];
             case 5:
+                err_1 = _b.sent();
+                console.error(err_1);
+                resp.setRes(err_1);
+                return [3 /*break*/, 6];
+            case 6:
                 res.send(resp.toRes());
                 return [2 /*return*/];
         }
     });
 }); });
-router.get('/dir', function (req, res, next) {
-    var path = req.query.path;
-    var resp = new Response_1.default();
-    if (typeof path === 'string') {
-        try {
-            var lstat = (0, fs_extra_1.lstatSync)(path);
-            if (lstat.isDirectory()) {
-                resp.setRes('获取目录详情成功', true, (0, utils_1.dirDetail)(path));
-            }
-            else {
+router.get('/dir', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var path, resp, lstat, _a, _b, _c, err_2;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
+            case 0:
+                path = req.query.path;
+                resp = new Response_1.default();
+                if (!(typeof path === 'string')) return [3 /*break*/, 7];
+                _d.label = 1;
+            case 1:
+                _d.trys.push([1, 5, , 6]);
+                lstat = (0, fs_extra_1.lstatSync)(path);
+                if (!lstat.isDirectory()) return [3 /*break*/, 3];
+                _b = (_a = resp).setRes;
+                _c = ['获取目录详情成功', true];
+                return [4 /*yield*/, (0, utils_1.dirDetail)(path)];
+            case 2:
+                _b.apply(_a, _c.concat([_d.sent()]));
+                return [3 /*break*/, 4];
+            case 3:
                 resp.setRes("".concat(path, " \u4E0D\u662F\u4E00\u4E2A\u76EE\u5F55"));
-            }
+                _d.label = 4;
+            case 4: return [3 /*break*/, 6];
+            case 5:
+                err_2 = _d.sent();
+                console.error(err_2);
+                resp.setRes("".concat(err_2));
+                return [3 /*break*/, 6];
+            case 6: return [3 /*break*/, 8];
+            case 7:
+                if (path === undefined) {
+                    resp.setRes('path 为必传参数!');
+                }
+                else {
+                    resp.setRes('path 类型必须为string!');
+                }
+                _d.label = 8;
+            case 8:
+                res.send(resp.toRes());
+                return [2 /*return*/];
         }
-        catch (err) {
-            resp.setRes("".concat(err));
-        }
-    }
-    else if (path === undefined) {
-        resp.setRes('path 为必传参数!');
-    }
-    else {
-        resp.setRes('path 类型必须为string!');
-    }
-    res.send(resp.toRes());
-});
+    });
+}); });
 exports.default = router;

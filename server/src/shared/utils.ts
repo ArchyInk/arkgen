@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-14 16:15:27
+ * @LastEditTime: 2022-02-17 14:06:21
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -16,7 +16,7 @@ import {
   Stats,
 } from 'fs-extra'
 import { DirType } from '../../../types/server'
-import { join } from 'path'
+import { join, extname } from 'path'
 import { CWD } from './constants'
 import nm from 'nanomatch'
 
@@ -62,7 +62,7 @@ export const pathType = (path: string): 'directory' | 'file' | 'unknown' =>
  * @param {string} path
  * @return {DirsType}
  */
-export const dirDetail = (path: string): DirType[] => {
+export const dirDetail = async (path: string): Promise<DirType[]> => {
   const names = readdirSync(path)
   const resArr: DirType[] = []
   for (let name of names) {
@@ -78,6 +78,7 @@ export const dirDetail = (path: string): DirType[] => {
             : 'unknown',
         isLeaf: res.isFile() ? true : false,
         info: res,
+        ext: res.isFile() ? extname(name) : undefined,
       })
     } catch (err) {
       resArr.push({

@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-30 20:30:41
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-16 17:29:16
+ * @LastEditTime: 2022-02-17 14:04:10
  * @FilePath: \arkgen\react\src\pages\project\index.tsx
  * @description: 
  */
@@ -126,6 +126,7 @@ const Project: React.FC = () => {
     }
 
     const onSelect = (key: (string | number)[], { node }: any) => {
+      console.log(node);
     }
 
     const cardStyle: React.CSSProperties = { height: '100%' }

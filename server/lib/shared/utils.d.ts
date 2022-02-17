@@ -28,7 +28,7 @@ export declare const pathType: (path: string) => 'directory' | 'file' | 'unknown
  * @param {string} path
  * @return {DirsType}
  */
-export declare const dirDetail: (path: string) => DirType[];
+export declare const dirDetail: (path: string) => Promise<DirType[]>;
 /**
  * @description: 向下查找文件
  * @param {string} filename 文件名,支持通配符

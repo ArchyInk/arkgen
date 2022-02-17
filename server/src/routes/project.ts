@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-14 16:16:58
+ * @LastEditTime: 2022-02-17 11:44:20
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
@@ -64,26 +64,28 @@ router.get('/', async (req, res, next) => {
   try {
     await findPkg()
     await findViteConfig()
-    draft.dirs = dirDetail(CWD)
+    draft.dirs = await dirDetail(CWD)
     resp.setRes('获取项目详情成功！', true, draft)
   } catch (err) {
+    console.error(err);
     resp.setRes(err)
   }
   res.send(resp.toRes())
 })
 
-router.get('/dir', function (req, res, next) {
+router.get('/dir', async (req, res, next) => {
   const { path } = req.query
   const resp = new Resp()
   if (typeof path === 'string') {
     try {
       const lstat = lstatSync(path)
       if (lstat.isDirectory()) {
-        resp.setRes('获取目录详情成功', true, dirDetail(path))
+        resp.setRes('获取目录详情成功', true, await dirDetail(path))
       } else {
         resp.setRes(`${path} 不是一个目录`)
       }
     } catch (err) {
+      console.error(err);
       resp.setRes(`${err}`)
     }
   } else if (path === undefined) {
