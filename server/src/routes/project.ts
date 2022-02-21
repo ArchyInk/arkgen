@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-17 11:44:20
+ * @LastEditTime: 2022-02-21 11:10:52
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
@@ -14,12 +14,13 @@ import {
   accessSync,
   constants,
 } from 'fs-extra'
-import { join } from 'path'
+import ext2lang from 'ext2lang'
+import { parse } from 'path'
 import findUp from 'find-up'
 import { CWD } from '../shared/constants'
 import Resp from '../class/Response'
 import { dirDetail } from '../shared/utils'
-import { DirType } from '../../../types/server'
+import { DirType, FileInfoType } from '../../../types/server'
 const router = express.Router()
 
 export type ProjectInfoType = {
@@ -30,6 +31,7 @@ export type ProjectInfoType = {
   hasViteConfig?: boolean,
   viteConfig?: string,
 }
+
 
 router.get('/', async (req, res, next) => {
   // eslint-disable-line
@@ -75,7 +77,7 @@ router.get('/', async (req, res, next) => {
 
 router.get('/dir', async (req, res, next) => {
   const { path } = req.query
-  const resp = new Resp()
+  const resp = new Resp<DirType[]>()
   if (typeof path === 'string') {
     try {
       const lstat = lstatSync(path)
@@ -84,6 +86,35 @@ router.get('/dir', async (req, res, next) => {
       } else {
         resp.setRes(`${path} 不是一个目录`)
       }
+    } catch (err) {
+      console.error(err);
+      resp.setRes(`${err}`)
+    }
+  } else if (path === undefined) {
+    resp.setRes('path 为必传参数!')
+  } else {
+    resp.setRes('path 类型必须为string!')
+  }
+
+  res.send(resp.toRes())
+})
+
+router.get('/file', async (req, res, next) => {
+  const { path } = req.query
+  const resp = new Resp<FileInfoType>()
+  const draft: FileInfoType = {
+    filename: '',
+    lang: 'plaintext',
+    content: '',
+    path: path as string,
+  }
+  if (typeof path === 'string') {
+    try {
+      draft.content = readFileSync(path, 'utf-8')
+      const { name, ext } = parse(path)
+      draft.filename = name
+      draft.lang = ext2lang(ext) ?? 'plaintext'
+      resp.setRes('获取文件内容成功', true, draft)
     } catch (err) {
       console.error(err);
       resp.setRes(`${err}`)

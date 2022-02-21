@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-02-14 15:36:34
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-17 14:03:03
+ * @LastEditTime: 2022-02-21 11:11:38
  * @FilePath: \arkgen\types\server.d.ts
  * @description: 
  */
@@ -17,4 +17,11 @@ export type DirType = {
   children?: DirType[],
   info?: Stats,
   err?: Error
+}
+
+export type FileInfoType = {
+  path: string,
+  filename: string,
+  lang: string,
+  content: string
 }

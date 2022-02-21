@@ -2,19 +2,20 @@
  * @Author: Archy
  * @Date: 2022-01-30 22:11:31
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-14 16:28:34
+ * @LastEditTime: 2022-02-21 11:13:35
  * @FilePath: \arkgen\react\src\api\project.ts
  * @description:
  */
 import { request, AxiosPromise } from './request'
 import { GeneralResponse } from './response'
-import { DirType } from '../../../types/server'
-export type { DirType } from '../../../types/server'
+import type { DirType, FileInfoType } from '../../../types/server'
+export type { DirType, FileInfoType } from '../../../types/server'
 import qs from 'qs'
 
 export const api = {
   getProjectInfo: '/project',
   getDir: '/project/dir',
+  getFile: '/project/file'
 }
 
 export interface ProjectInfo {
@@ -24,10 +25,10 @@ export interface ProjectInfo {
   dirs: DirType[]
 }
 
-
 export const getProjectInfo = (parameter?: any): AxiosPromise<ProjectInfo> => {
   return request({
     url: api.getProjectInfo,
+    method: 'get',
     params: qs.stringify(parameter),
   })
 }
@@ -35,6 +36,16 @@ export const getProjectInfo = (parameter?: any): AxiosPromise<ProjectInfo> => {
 export const getDir = (parameter?: any): AxiosPromise<DirType[]> => {
   return request({
     url: api.getDir,
-    params: qs.parse(parameter),
+    method: 'get',
+    params: parameter,
+  })
+}
+
+
+export const getFile = (parameter?: any): AxiosPromise<FileInfoType> => {
+  return request({
+    url: api.getFile,
+    method: 'get',
+    params: parameter,
   })
 }

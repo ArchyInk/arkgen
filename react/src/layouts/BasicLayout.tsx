@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-30 09:16:43
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-14 11:55:55
+ * @LastEditTime: 2022-02-21 17:01:54
  * @FilePath: \arkgen\react\src\layouts\BasicLayout.tsx
  * @description: 
  */
@@ -13,11 +13,13 @@ import { appState } from '../stores/app'
 import { useRecoilState } from 'recoil'
 import './BasicLayout.less'
 import Menu from '../components/Menu'
+import { ConsoleMenu } from '../components/Console'
+import ConsoleUI from '../components/Console/consoleUI'
 const { Sider, Content } = Layout
 const BasicLayout: React.FC = () => {
   const [app, setApp] = useRecoilState(appState)
   const [width, setWidth] = useState(64)
-  const [collapsed,setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const handleMouseenter = () => {
     setWidth(168)
     setCollapsed(true)
@@ -36,8 +38,11 @@ const BasicLayout: React.FC = () => {
         width={width}
         onMouseEnter={handleMouseenter}
         onMouseLeave={handleMouselevel}
+
       >
         <Menu collapsed={collapsed}></Menu>
+        <ConsoleMenu collapsed={collapsed} style={{ position: 'absolute', bottom: '20px' }}></ConsoleMenu>
+        <ConsoleUI></ConsoleUI>
       </Sider>
       <Layout>
         <Content><Outlet /></Content>

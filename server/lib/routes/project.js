@@ -43,12 +43,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-17 11:44:20
+ * @LastEditTime: 2022-02-21 11:10:52
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
 var express_1 = __importDefault(require("express"));
 var fs_extra_1 = require("fs-extra");
+var ext2lang_1 = __importDefault(require("ext2lang"));
+var path_1 = require("path");
 var find_up_1 = __importDefault(require("find-up"));
 var constants_1 = require("../shared/constants");
 var Response_1 = __importDefault(require("../class/Response"));
@@ -169,6 +171,41 @@ router.get('/dir', function (req, res, next) { return __awaiter(void 0, void 0, 
                 res.send(resp.toRes());
                 return [2 /*return*/];
         }
+    });
+}); });
+router.get('/file', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var path, resp, draft, _a, name_1, ext;
+    var _b;
+    return __generator(this, function (_c) {
+        path = req.query.path;
+        resp = new Response_1.default();
+        draft = {
+            filename: '',
+            lang: 'plaintext',
+            content: '',
+            path: path,
+        };
+        if (typeof path === 'string') {
+            try {
+                draft.content = (0, fs_extra_1.readFileSync)(path, 'utf-8');
+                _a = (0, path_1.parse)(path), name_1 = _a.name, ext = _a.ext;
+                draft.filename = name_1;
+                draft.lang = (_b = (0, ext2lang_1.default)(ext)) !== null && _b !== void 0 ? _b : 'plaintext';
+                resp.setRes('获取文件内容成功', true, draft);
+            }
+            catch (err) {
+                console.error(err);
+                resp.setRes("".concat(err));
+            }
+        }
+        else if (path === undefined) {
+            resp.setRes('path 为必传参数!');
+        }
+        else {
+            resp.setRes('path 类型必须为string!');
+        }
+        res.send(resp.toRes());
+        return [2 /*return*/];
     });
 }); });
 exports.default = router;

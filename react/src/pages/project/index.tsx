@@ -2,13 +2,14 @@
  * @Author: Archy
  * @Date: 2022-01-30 20:30:41
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-17 14:04:10
+ * @LastEditTime: 2022-02-21 16:10:27
  * @FilePath: \arkgen\react\src\pages\project\index.tsx
  * @description: 
  */
 import React, { useState, useEffect, ReactNode } from "react";
-import { notification, Row, Col, Tree, Card, Descriptions } from "antd";
-import { getProjectInfo, ProjectInfo, getDir, DirType } from "../../api/project";
+import { notification, Row, Col, Tree, Card, Descriptions, Spin } from "antd";
+import { getProjectInfo, getDir, getFile } from "../../api/project";
+import type { DirType, ProjectInfo } from "../../api/project"
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { vs2015 } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 const { DirectoryTree } = Tree
@@ -17,12 +18,19 @@ import './index.less'
 const Project: React.FC = () => {
   const [projectInfo, setProjectInfo] = useState<ProjectInfo>()
   const [dirs, setDirs] = useState<DirType[]>()
+  const [selectFileType, setSelectFileType] = useState<string>('plaintext')
+  const [content, setContent] = useState<string>('')
+  const [rightSpin, setRightSpin] = useState<boolean>(false)
   const cardHeaderStyle: React.CSSProperties = { display: 'flex', height: '3rem', alignItems: 'center' }
   const handleProjectInfo = async () => {
     const result = await getProjectInfo()
     if (result.success) {
       setProjectInfo(result.data)
       setDirs(result.data?.dirs)
+      if (result.data.hasPkg) {
+        setContent(result.data.pkg)
+        setSelectFileType('json')
+      }
     } else {
       notification.error({ message: '获取项目信息出错：' + result.msg })
     }
@@ -125,12 +133,24 @@ const Project: React.FC = () => {
       }
     }
 
-    const onSelect = (key: (string | number)[], { node }: any) => {
-      console.log(node);
+    const onSelect = async (key: (string | number)[], { node }: any) => {
+      if (node.type === 'file') {
+        setRightSpin(true)
+        getFile({ path: key.pop() }).then(res => {
+          setRightSpin(false)
+          if (res.success) {
+            setContent(res.data.content)
+            setSelectFileType(res.data.lang)
+          } else {
+            setContent('文件内容获取出错！')
+            setSelectFileType('plaintext')
+          }
+        })
+      }
     }
 
     const cardStyle: React.CSSProperties = { height: '100%' }
-    const bodyStyle: React.CSSProperties = { height: '100%', overflow: 'auto' }
+    const bodyStyle: React.CSSProperties = { height: 'calc(100% - 3rem)', overflow: 'auto' }
     return (
       <Card title="项目结构" style={cardStyle} headStyle={cardHeaderStyle} bodyStyle={bodyStyle}>
         <DirectoryTree treeData={dirs} loadData={onLoadData} titleRender={customRender} onSelect={onSelect}></DirectoryTree>
@@ -142,14 +162,12 @@ const Project: React.FC = () => {
     const bodyStyle: React.CSSProperties = { marginBottom: '8px' }
     return (
       <Card title="任务列表" style={bodyStyle} headStyle={cardHeaderStyle}>
-
       </Card>
     )
   }
   const renderDependenciesList = () => {
     return (
       <Card title="依赖列表" headStyle={cardHeaderStyle}>
-
       </Card>
     )
   }
@@ -165,13 +183,12 @@ const Project: React.FC = () => {
   const renderRight = () => {
     const divStyle: React.CSSProperties = { height: '100%', width: '100%' }
     const customStyle: React.CSSProperties = { height: '100%' }
-    const switchLanguage = () => {
-
-    }
+    const spinStyle: React.CSSProperties = { position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }
     return (
       <div style={divStyle}>
-        <SyntaxHighlighter language="json" style={vs2015} customStyle={customStyle} showLineNumbers wrapLongLines >
-          {projectInfo ? projectInfo.pkg : '未获取到pkg'}
+        <Spin spinning={rightSpin} style={spinStyle} tip='正在打开文件' />
+        <SyntaxHighlighter language={selectFileType} style={vs2015} customStyle={customStyle} showLineNumbers >
+          {content}
         </SyntaxHighlighter>
       </div>
     )
