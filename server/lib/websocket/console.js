@@ -3,7 +3,7 @@
  * @author: Archy
  * @Date: 2022-02-21 16:46:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-22 15:07:38
+ * @LastEditTime: 2022-02-22 17:12:37
  * @FilePath: \arkgen\server\src\websocket\console.ts
  * @description:
  */
@@ -15,15 +15,26 @@ exports.default = (function (server) {
     wss.on('connection', function connection(ws) {
         ws.on('message', function message(data) {
             try {
-                var cp = (0, child_process_1.exec)(data.toString(), function (error, stdout, stderr) {
-                    error && ws.send(JSON.stringify(error));
-                    stdout && ws.send(JSON.stringify(stdout));
-                    stderr && ws.send(JSON.stringify(stderr));
+                (0, child_process_1.exec)(data.toString(), { encoding: 'utf8' }, function (error, stdout, stderr) {
+                    ws.send(data.toString());
+                    if (error) {
+                        error.stack.toString().split(/\r?\n/).map(function (line) {
+                            ws.send(line);
+                        });
+                        return;
+                    }
+                    stdout.split(/\r?\n/).map(function (line) {
+                        ws.send(line);
+                    });
+                    stderr.split(/\r?\n/).map(function (line) {
+                        ws.send(line);
+                    });
                 });
-                console.log(cp);
             }
             catch (err) {
-                ws.send(JSON.stringify(err));
+                err.stack.toString().split(/\r?\n/).map(function (line) {
+                    ws.send(line);
+                });
             }
         });
         ws.send('');

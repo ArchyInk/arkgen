@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-02-21 16:59:33
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-22 15:04:49
+ * @LastEditTime: 2022-02-22 16:59:16
  * @FilePath: \arkgen\react\src\components\Console\console.tsx
  * @description: 
  */
@@ -30,7 +30,7 @@ const defaultProps: ConsoleProps = {
   visible: false,
   height: 300,
   width: 500,
-  style: { position: 'fixed', left: 0, bottom: 0, background: '#1e1e1e', color: '#b6b6b6', overflow: 'auto' }
+  style: { position: 'fixed', left: 0, bottom: 0, background: '#1e1e1e', wordBreak: 'break-word', color: '#b6b6b6', overflow: 'auto' }
 }
 
 const Console: React.FC<ConsoleProps> = (props) => {
@@ -67,9 +67,9 @@ const Console: React.FC<ConsoleProps> = (props) => {
   return (<>
     {props.visible ? (
       <div className='console' style={{ height: props.height, width: props.width, zIndex: 999, ...Object.assign(defaultProps.style, props.style) }}>
-        {consoleContent.current.map((message, index) => (
-          <p key={index}>{message?.data}</p>
-        ))}
+        {consoleContent.current.map((message, index) => {
+          return <p key={index}>{message?.data}</p>
+        })}
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <RightOutlined />
           <Input value={consoleInput} placeholder='输入命令' bordered={false} onPressEnter={handlePressEnter} onChange={(e) => { setConsoleInput(e.target.value) }} style={{ color: 'white' }}></Input>
