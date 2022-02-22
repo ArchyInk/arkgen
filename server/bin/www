@@ -17,13 +17,13 @@ var port = normalizePort(process.env.PORT || '4000')
 app.set('port', port)
 
 var wssPort = normalizePort(process.env.WSS_PORT || '4001')
-wss(wssPort)
 
 /**
  * Create HTTP server.
  */
 
 var server = http.createServer(app)
+wss(server)
 
 /**
  * Listen on provided port, on all network interfaces.

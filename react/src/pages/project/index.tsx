@@ -2,11 +2,11 @@
  * @Author: Archy
  * @Date: 2022-01-30 20:30:41
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-21 16:10:27
+ * @LastEditTime: 2022-02-22 14:47:53
  * @FilePath: \arkgen\react\src\pages\project\index.tsx
  * @description: 
  */
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect } from "react";
 import { notification, Row, Col, Tree, Card, Descriptions, Spin } from "antd";
 import { getProjectInfo, getDir, getFile } from "../../api/project";
 import type { DirType, ProjectInfo } from "../../api/project"
