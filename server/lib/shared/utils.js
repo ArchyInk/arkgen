@@ -3,7 +3,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-17 14:06:21
+ * @LastEditTime: 2022-02-28 10:45:22
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -58,11 +58,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findFileAsync = exports.dirDetail = exports.pathType = exports.isExist = exports.isFile = exports.isDir = void 0;
+exports.findViteConfig = exports.findPkg = exports.findFileAsync = exports.dirDetail = exports.pathType = exports.isExist = exports.isFile = exports.isDir = void 0;
 var fs_extra_1 = require("fs-extra");
 var path_1 = require("path");
 var constants_1 = require("./constants");
 var nanomatch_1 = __importDefault(require("nanomatch"));
+var find_up_1 = __importDefault(require("find-up"));
 /**
  * @description: 判断路径是否为目录
  * @param {string} path
@@ -268,3 +269,51 @@ var findFileAsync = function (filename, options) {
     return find(_cwd);
 };
 exports.findFileAsync = findFileAsync;
+/**
+ * @description: 向上查找pkg
+ * @param {*}
+ * @return {*}
+ */
+var findPkg = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var draft, pkgPath, pkg;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                draft = { hasPkg: false };
+                return [4 /*yield*/, (0, find_up_1.default)('package.json')];
+            case 1:
+                pkgPath = _a.sent();
+                if (pkgPath) {
+                    draft.hasPkg = true;
+                    pkg = (0, fs_extra_1.readFileSync)(pkgPath, 'utf-8');
+                    draft.pkg = pkg;
+                }
+                return [2 /*return*/, draft];
+        }
+    });
+}); };
+exports.findPkg = findPkg;
+/**
+ * @description: 向上查找vite配置
+ * @param {*}
+ * @return {*}
+ */
+var findViteConfig = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var draft, vitePath, viteConfig;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                draft = { hasViteConfig: false };
+                return [4 /*yield*/, (0, find_up_1.default)(['vite.config.ts', 'vite.config.js'])];
+            case 1:
+                vitePath = _a.sent();
+                if (vitePath) {
+                    draft.hasViteConfig = true;
+                    viteConfig = (0, fs_extra_1.readFileSync)(vitePath, 'utf-8');
+                    draft.viteConfig = viteConfig;
+                }
+                return [2 /*return*/, draft];
+        }
+    });
+}); };
+exports.findViteConfig = findViteConfig;

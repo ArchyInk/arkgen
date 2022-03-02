@@ -2,16 +2,18 @@
  * @Author: Archy
  * @Date: 2022-01-30 20:30:41
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-22 14:47:53
+ * @LastEditTime: 2022-03-02 14:57:35
  * @FilePath: \arkgen\react\src\pages\project\index.tsx
  * @description: 
  */
 import React, { useState, useEffect } from "react";
-import { notification, Row, Col, Tree, Card, Descriptions, Spin } from "antd";
-import { getProjectInfo, getDir, getFile } from "../../api/project";
-import type { DirType, ProjectInfo } from "../../api/project"
+import { notification, Row, Col, Tree, Card, Descriptions, Spin, List, Button } from "antd";
+import type { CardTabListType } from 'antd/lib/card'
+import { getProjectInfo, getDir, getFile, getTaskList, getDependenceList } from "../../api/project";
+import type { DirType, ProjectInfo, TaskListType, DependenceList } from "../../api/project"
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { vs2015 } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import { LinkOutlined } from '@ant-design/icons'
 const { DirectoryTree } = Tree
 
 import './index.less'
@@ -21,6 +23,8 @@ const Project: React.FC = () => {
   const [selectFileType, setSelectFileType] = useState<string>('plaintext')
   const [content, setContent] = useState<string>('')
   const [rightSpin, setRightSpin] = useState<boolean>(false)
+  const [taskList, setTaskList] = useState<TaskListType[]>([])
+  const [dependenceList, setDependenceList] = useState<DependenceList[]>([])
   const cardHeaderStyle: React.CSSProperties = { display: 'flex', height: '3rem', alignItems: 'center' }
   const handleProjectInfo = async () => {
     const result = await getProjectInfo()
@@ -36,8 +40,28 @@ const Project: React.FC = () => {
     }
   }
 
+  const handleProjectTaskList = async () => {
+    const result = await getTaskList()
+    if (result.success) {
+      setTaskList(result.data)
+    } else {
+      notification.error({ message: '获取项目信息出错：' + result.msg })
+    }
+  }
+
+  const handleProjectDependenceList = async () => {
+    const result = await getDependenceList()
+    if (result.success) {
+      setDependenceList(result.data)
+    } else {
+      notification.error({ message: '获取项目信息出错：' + result.msg })
+    }
+  }
+
   useEffect(() => {
     handleProjectInfo()
+    handleProjectTaskList()
+    handleProjectDependenceList()
   }, [])
 
   const renderProjectCard = () => {
@@ -49,10 +73,13 @@ const Project: React.FC = () => {
             {projectInfo.hasPkg ?
               <>
                 <Descriptions.Item label="名称">{JSON.parse(projectInfo.pkg).name}</Descriptions.Item>
-                <Descriptions.Item label="版本">{JSON.parse(projectInfo.pkg).version}</Descriptions.Item>
-                <Descriptions.Item label="描述">{JSON.parse(projectInfo.pkg).description}</Descriptions.Item>
                 <Descriptions.Item label="作者">{JSON.parse(projectInfo.pkg).author}</Descriptions.Item>
+                <Descriptions.Item label="版本">{JSON.parse(projectInfo.pkg).version}</Descriptions.Item>
                 <Descriptions.Item label="授权">{JSON.parse(projectInfo.pkg).license} </Descriptions.Item>
+                <Descriptions.Item label="代码库" span={2}><a target='_blank' href={JSON.parse(projectInfo.pkg).repository.url.split('+')[1]}>
+                  {JSON.parse(projectInfo.pkg).repository.url.split('+')[1]}</a>
+                </Descriptions.Item>
+                <Descriptions.Item label="描述" span={3}>{JSON.parse(projectInfo.pkg).description}</Descriptions.Item>
               </>
               :
               <>
@@ -71,13 +98,13 @@ const Project: React.FC = () => {
 
   const renderLeftBody = () => {
     const rowStyle: React.CSSProperties = { padding: 8, paddingRight: 0, height: '100%' }
+    const colStyle: React.CSSProperties = { flexDirection: 'column', display: 'flex', height: '100%' }
     const fullHeightStyle: React.CSSProperties = { height: '100%' }
     return (
       < Row style={rowStyle} gutter={8}>
-        <Col span={16}>
+        <Col span={16} style={colStyle}>
           {renderProjectCard()}
-          {renderTaskList()}
-          {renderDependenciesList()}
+          {renderDetailList()}
         </Col>
         <Col span={8} style={fullHeightStyle}>
           {renderDirs()}
@@ -158,20 +185,52 @@ const Project: React.FC = () => {
     )
   }
 
-  const renderTaskList = () => {
-    const bodyStyle: React.CSSProperties = { marginBottom: '8px' }
+  const renderDetailList = () => {
+    const cardStyle: React.CSSProperties = { flex: '1 0 auto', display: 'flex', flexDirection: 'column' }
+    const bodyStyle: React.CSSProperties = { overflow: 'auto', flex: '1 1 auto', padding: '0', height: 0 }
+    const gridStyle: React.CSSProperties = { width: '33.33%', textAlign: 'center', border: 'none', cursor: 'pointer' }
+    const itemStyle: React.CSSProperties = { fontSize: '18px', display: 'flex', justifyContent: 'space-between' }
+    const [activeTab, setActiveTab] = useState<string>('taskList')
+    const openNpm = (depName: string) => {
+      window.open('https://www.npmjs.com/package/' + depName)
+    }
+    const tablist: CardTabListType[] = [
+      {
+        key: 'taskList',
+        tab: '任务列表',
+      },
+      {
+        key: 'dependenceList',
+        tab: '依赖列表',
+      },
+    ]
+    const contentList: Record<string, JSX.Element> = {
+      taskList: <List
+        style={{ padding: '0 16px' }}
+        size="large"
+        bordered
+        dataSource={taskList}
+        renderItem={item => <List.Item style={itemStyle}><div>{item.name}</div><Button>运行</Button></List.Item>}
+      />,
+      dependenceList:
+        <Card >
+          {dependenceList.map((item) =>
+          (
+            <Card.Grid style={gridStyle} onClick={(e) => { openNpm(item.name) }}>
+              {item.name}
+            </Card.Grid>
+          ))
+          }
+        </Card>,
+    }
     return (
-      <Card title="任务列表" style={bodyStyle} headStyle={cardHeaderStyle}>
+      <Card tabList={tablist} className="project__detail-card" style={cardStyle} bodyStyle={bodyStyle} headStyle={cardHeaderStyle} activeTabKey={activeTab} onTabChange={(key: any) => {
+        setActiveTab(key)
+      }}>
+        {contentList[activeTab]}
       </Card>
     )
   }
-  const renderDependenciesList = () => {
-    return (
-      <Card title="依赖列表" headStyle={cardHeaderStyle}>
-      </Card>
-    )
-  }
-
 
   const renderLeft = () => {
     return (

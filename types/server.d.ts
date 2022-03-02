@@ -2,7 +2,7 @@
  * @author: Archy
  * @Date: 2022-02-14 15:36:34
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-21 11:11:38
+ * @LastEditTime: 2022-02-28 11:25:12
  * @FilePath: \arkgen\types\server.d.ts
  * @description: 
  */
@@ -24,4 +24,16 @@ export type FileInfoType = {
   filename: string,
   lang: string,
   content: string
+}
+
+export type TaskListType = {
+  name: string,
+  task: string,
+  description?: string,
+}
+
+export type DependenceList = {
+  name: string,
+  version: string,
+  dev?: boolean
 }

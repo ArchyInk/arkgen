@@ -40,3 +40,21 @@ export declare const findFileAsync: (filename: string, options?: {
     include?: string[];
     cwd?: string;
 }) => string;
+/**
+ * @description: 向上查找pkg
+ * @param {*}
+ * @return {*}
+ */
+export declare const findPkg: () => Promise<{
+    hasPkg: boolean;
+    pkg?: string;
+}>;
+/**
+ * @description: 向上查找vite配置
+ * @param {*}
+ * @return {*}
+ */
+export declare const findViteConfig: () => Promise<{
+    hasViteConfig: boolean;
+    viteConfig?: string;
+}>;

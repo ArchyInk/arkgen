@@ -35,6 +35,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -43,7 +54,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-21 11:10:52
+ * @LastEditTime: 2022-02-28 11:31:25
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
@@ -51,13 +62,12 @@ var express_1 = __importDefault(require("express"));
 var fs_extra_1 = require("fs-extra");
 var ext2lang_1 = __importDefault(require("ext2lang"));
 var path_1 = require("path");
-var find_up_1 = __importDefault(require("find-up"));
 var constants_1 = require("../shared/constants");
 var Response_1 = __importDefault(require("../class/Response"));
 var utils_1 = require("../shared/utils");
 var router = express_1.default.Router();
 router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var resp, draft, findPkg, findViteConfig, _a, err_1;
+    var resp, draft, findPkgResult, findViteConfigResult, _a, err_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -66,53 +76,16 @@ router.get('/', function (req, res, next) { return __awaiter(void 0, void 0, voi
                     path: constants_1.CWD,
                     dirs: []
                 };
-                findPkg = function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var pkgPath, pkg;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, (0, find_up_1.default)('package.json')];
-                            case 1:
-                                pkgPath = _a.sent();
-                                if (pkgPath) {
-                                    draft.hasPkg = true;
-                                    pkg = (0, fs_extra_1.readFileSync)(pkgPath, 'utf-8');
-                                    draft.pkg = pkg;
-                                }
-                                else {
-                                    draft.hasPkg = false;
-                                }
-                                return [2 /*return*/];
-                        }
-                    });
-                }); };
-                findViteConfig = function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var vitePath, viteConfig;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0: return [4 /*yield*/, (0, find_up_1.default)(['vite.config.ts', 'vite.config.js'])];
-                            case 1:
-                                vitePath = _a.sent();
-                                if (vitePath) {
-                                    draft.hasViteConfig = true;
-                                    viteConfig = (0, fs_extra_1.readFileSync)(vitePath, 'utf-8');
-                                    draft.viteConfig = viteConfig;
-                                }
-                                else {
-                                    draft.hasViteConfig = false;
-                                }
-                                return [2 /*return*/];
-                        }
-                    });
-                }); };
                 _b.label = 1;
             case 1:
                 _b.trys.push([1, 5, , 6]);
-                return [4 /*yield*/, findPkg()];
+                return [4 /*yield*/, (0, utils_1.findPkg)()];
             case 2:
-                _b.sent();
-                return [4 /*yield*/, findViteConfig()];
+                findPkgResult = _b.sent();
+                return [4 /*yield*/, (0, utils_1.findViteConfig)()];
             case 3:
-                _b.sent();
+                findViteConfigResult = _b.sent();
+                Object.assign(draft, findPkgResult, findViteConfigResult);
                 _a = draft;
                 return [4 /*yield*/, (0, utils_1.dirDetail)(constants_1.CWD)];
             case 4:
@@ -206,6 +179,128 @@ router.get('/file', function (req, res, next) { return __awaiter(void 0, void 0,
         }
         res.send(resp.toRes());
         return [2 /*return*/];
+    });
+}); });
+router.get('/taskList', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var resp, draftArray, findPkgResult, pkgObj, _a, _b, name_2, err_3;
+    var e_1, _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
+            case 0:
+                resp = new Response_1.default();
+                draftArray = [];
+                _d.label = 1;
+            case 1:
+                _d.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, (0, utils_1.findPkg)()];
+            case 2:
+                findPkgResult = _d.sent();
+                if (findPkgResult.hasPkg) {
+                    pkgObj = JSON.parse(findPkgResult.pkg);
+                    try {
+                        for (_a = __values(Object.keys(pkgObj.scripts)), _b = _a.next(); !_b.done; _b = _a.next()) {
+                            name_2 = _b.value;
+                            draftArray.push({
+                                name: name_2,
+                                task: pkgObj.scripts[name_2],
+                                description: pkgObj['_scripts'] ? pkgObj['_scripts'][name_2] : undefined,
+                            });
+                        }
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (_b && !_b.done && (_c = _a.return)) _c.call(_a);
+                        }
+                        finally { if (e_1) throw e_1.error; }
+                    }
+                    resp.setRes('成功获取任务列表', true, draftArray);
+                }
+                else {
+                    resp.setRes('没找到pkg文件!');
+                }
+                return [3 /*break*/, 4];
+            case 3:
+                err_3 = _d.sent();
+                console.error(err_3);
+                resp.setRes("".concat(err_3));
+                return [3 /*break*/, 4];
+            case 4:
+                res.send(resp.toRes());
+                return [2 /*return*/];
+        }
+    });
+}); });
+router.get('/dependenceList', function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var resp, draftArray, findPkgResult, pkgObj, dependenceList, devDependenceList, _a, _b, name_3, _c, _d, name_4, err_4;
+    var e_2, _e, e_3, _f;
+    return __generator(this, function (_g) {
+        switch (_g.label) {
+            case 0:
+                resp = new Response_1.default();
+                draftArray = [];
+                _g.label = 1;
+            case 1:
+                _g.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, (0, utils_1.findPkg)()];
+            case 2:
+                findPkgResult = _g.sent();
+                if (findPkgResult.hasPkg) {
+                    pkgObj = JSON.parse(findPkgResult.pkg);
+                    dependenceList = pkgObj.dependencies;
+                    devDependenceList = pkgObj.devDependencies;
+                    if (dependenceList) {
+                        try {
+                            for (_a = __values(Object.keys(dependenceList)), _b = _a.next(); !_b.done; _b = _a.next()) {
+                                name_3 = _b.value;
+                                draftArray.push({
+                                    name: name_3,
+                                    version: dependenceList[name_3],
+                                });
+                            }
+                        }
+                        catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                        finally {
+                            try {
+                                if (_b && !_b.done && (_e = _a.return)) _e.call(_a);
+                            }
+                            finally { if (e_2) throw e_2.error; }
+                        }
+                    }
+                    if (devDependenceList) {
+                        try {
+                            for (_c = __values(Object.keys(devDependenceList)), _d = _c.next(); !_d.done; _d = _c.next()) {
+                                name_4 = _d.value;
+                                draftArray.push({
+                                    name: name_4,
+                                    version: devDependenceList[name_4],
+                                    dev: true
+                                });
+                            }
+                        }
+                        catch (e_3_1) { e_3 = { error: e_3_1 }; }
+                        finally {
+                            try {
+                                if (_d && !_d.done && (_f = _c.return)) _f.call(_c);
+                            }
+                            finally { if (e_3) throw e_3.error; }
+                        }
+                    }
+                    resp.setRes('成功获取依赖列表', true, draftArray);
+                }
+                else {
+                    resp.setRes('没找到pkg文件!');
+                }
+                return [3 /*break*/, 4];
+            case 3:
+                err_4 = _g.sent();
+                console.error(err_4);
+                resp.setRes("".concat(err_4));
+                return [3 /*break*/, 4];
+            case 4:
+                res.send(resp.toRes());
+                return [2 /*return*/];
+        }
     });
 }); });
 exports.default = router;

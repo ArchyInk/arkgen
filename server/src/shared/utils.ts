@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-17 14:06:21
+ * @LastEditTime: 2022-02-28 10:45:22
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -13,13 +13,13 @@ import {
   constants,
   statSync,
   readdirSync,
-  Stats,
+  readFileSync
 } from 'fs-extra'
 import { DirType } from '../../../types/server'
 import { join, extname } from 'path'
 import { CWD } from './constants'
 import nm from 'nanomatch'
-
+import findUp from 'find-up'
 
 /**
  * @description: 判断路径是否为目录
@@ -155,4 +155,36 @@ export const findFileAsync = (filename: string, options?: { exclude?: string[]; 
     }
   }
   return find(_cwd)
+}
+
+/**
+ * @description: 向上查找pkg
+ * @param {*}
+ * @return {*}
+ */
+export const findPkg = async () => {
+  const draft: { hasPkg: boolean, pkg?: string } = { hasPkg: false }
+  const pkgPath = await findUp('package.json')
+  if (pkgPath) {
+    draft.hasPkg = true
+    const pkg = readFileSync(pkgPath, 'utf-8')
+    draft.pkg = pkg
+  }
+  return draft
+}
+
+/**
+ * @description: 向上查找vite配置
+ * @param {*}
+ * @return {*}
+ */
+export const findViteConfig = async () => {
+  const draft: { hasViteConfig: boolean, viteConfig?: string } = { hasViteConfig: false }
+  const vitePath = await findUp(['vite.config.ts', 'vite.config.js'])
+  if (vitePath) {
+    draft.hasViteConfig = true
+    const viteConfig = readFileSync(vitePath, 'utf-8')
+    draft.viteConfig = viteConfig
+  }
+  return draft
 }

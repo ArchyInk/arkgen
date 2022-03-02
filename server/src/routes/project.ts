@@ -2,25 +2,21 @@
  * @Author: Archy
  * @Date: 2022-01-31 11:27:01
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-21 11:10:52
+ * @LastEditTime: 2022-02-28 11:31:25
  * @FilePath: \arkgen\server\src\routes\project.ts
  * @description:
  */
 import express from 'express'
 import {
   lstatSync,
-  readdirSync,
   readFileSync,
-  accessSync,
-  constants,
 } from 'fs-extra'
 import ext2lang from 'ext2lang'
 import { parse } from 'path'
-import findUp from 'find-up'
 import { CWD } from '../shared/constants'
 import Resp from '../class/Response'
-import { dirDetail } from '../shared/utils'
-import { DirType, FileInfoType } from '../../../types/server'
+import { dirDetail, findPkg, findViteConfig } from '../shared/utils'
+import { DependenceList, DirType, FileInfoType, TaskListType } from '../../../types/server'
 const router = express.Router()
 
 export type ProjectInfoType = {
@@ -41,31 +37,10 @@ router.get('/', async (req, res, next) => {
     dirs: []
   }
 
-  const findPkg = async () => {
-    const pkgPath = await findUp('package.json')
-    if (pkgPath) {
-      draft.hasPkg = true
-      const pkg = readFileSync(pkgPath, 'utf-8')
-      draft.pkg = pkg
-    } else {
-      draft.hasPkg = false
-    }
-  }
-
-  const findViteConfig = async () => {
-    const vitePath = await findUp(['vite.config.ts', 'vite.config.js'])
-    if (vitePath) {
-      draft.hasViteConfig = true
-      const viteConfig = readFileSync(vitePath, 'utf-8')
-      draft.viteConfig = viteConfig
-    } else {
-      draft.hasViteConfig = false
-    }
-  }
-
   try {
-    await findPkg()
-    await findViteConfig()
+    const findPkgResult = await findPkg()
+    const findViteConfigResult = await findViteConfig()
+    Object.assign(draft, findPkgResult, findViteConfigResult)
     draft.dirs = await dirDetail(CWD)
     resp.setRes('获取项目详情成功！', true, draft)
   } catch (err) {
@@ -127,5 +102,72 @@ router.get('/file', async (req, res, next) => {
 
   res.send(resp.toRes())
 })
+
+router.get('/taskList', async (req, res, next) => {
+  const resp = new Resp<TaskListType[]>()
+  const draftArray: TaskListType[] = []
+  try {
+    const findPkgResult = await findPkg()
+    if (findPkgResult.hasPkg) {
+      const pkgObj = JSON.parse(findPkgResult.pkg)
+      for (let name of Object.keys(pkgObj.scripts)) {
+        draftArray.push({
+          name,
+          task: pkgObj.scripts[name],
+          description: pkgObj['_scripts'] ? pkgObj['_scripts'][name] : undefined,
+        })
+      }
+      resp.setRes('成功获取任务列表', true, draftArray)
+    } else {
+      resp.setRes('没找到pkg文件!')
+    }
+  } catch (err) {
+    console.error(err);
+    resp.setRes(`${err}`)
+  }
+  res.send(resp.toRes())
+})
+
+router.get('/dependenceList', async (req, res, next) => {
+  const resp = new Resp<DependenceList[]>()
+  const draftArray: DependenceList[] = []
+  try {
+    const findPkgResult = await findPkg()
+    if (findPkgResult.hasPkg) {
+      const pkgObj = JSON.parse(findPkgResult.pkg)
+      const dependenceList = pkgObj.dependencies
+      const devDependenceList = pkgObj.devDependencies
+
+      if (dependenceList) {
+        for (let name of Object.keys(dependenceList)) {
+          draftArray.push({
+            name,
+            version: dependenceList[name],
+          })
+        }
+      }
+
+      if (devDependenceList) {
+        for (let name of Object.keys(devDependenceList)) {
+          draftArray.push({
+            name,
+            version: devDependenceList[name],
+            dev: true
+          })
+        }
+      }
+      resp.setRes('成功获取依赖列表', true, draftArray)
+    } else {
+      resp.setRes('没找到pkg文件!')
+    }
+  } catch (err) {
+    console.error(err);
+    resp.setRes(`${err}`)
+  }
+  res.send(resp.toRes())
+})
+
+
+
 
 export default router

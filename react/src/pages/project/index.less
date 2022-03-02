@@ -43,10 +43,41 @@
   border-bottom: 1px solid #233333;
 }
 
-.ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected,.ant-tree.ant-tree-directory .ant-tree-treenode-selected .ant-tree-switcher {
+.ant-tree.ant-tree-directory .ant-tree-treenode .ant-tree-node-content-wrapper.ant-tree-node-selected,
+.ant-tree.ant-tree-directory .ant-tree-treenode-selected .ant-tree-switcher {
   color: black;
 }
 
 .ant-tree {
   background: transparent;
+}
+
+.project__detail-card {
+  .ant-tabs-top>.ant-tabs-nav .ant-tabs-ink-bar {
+    height: 0;
+  }
+
+  .ant-tabs-top>.ant-tabs-nav::before {
+    border: none;
+  }
+
+  .ant-tabs-tab {
+
+    &.ant-tabs-tab-active {
+      .ant-tabs-tab-btn {
+        font-family: inherit;
+        color: rgba(0, 0, 0, 0.85);
+        font-weight: bolder;
+      }
+    }
+
+    .ant-tabs-tab-btn {
+      color: #86909c;
+      text-shadow: none;
+    }
+  }
+
+  .ant-list-bordered {
+    border: none;
+  }
 }
