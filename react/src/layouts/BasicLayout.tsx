@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-30 09:16:43
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-22 14:52:44
+ * @LastEditTime: 2022-03-03 15:31:59
  * @FilePath: \arkgen\react\src\layouts\BasicLayout.tsx
  * @description: 
  */
@@ -13,7 +13,7 @@ import { appState } from '../stores/app'
 import { useRecoilState } from 'recoil'
 import './BasicLayout.less'
 import Menu from '../components/Menu'
-import { ConsoleButton, Console } from '../components/Console'
+import { TerminalButton, Terminal } from '../components/terminal'
 const { Sider, Content } = Layout
 const BasicLayout: React.FC = () => {
   const [app, setApp] = useRecoilState(appState)
@@ -42,12 +42,12 @@ const BasicLayout: React.FC = () => {
 
       >
         <Menu collapsed={collapsed}></Menu>
-        <ConsoleButton collapsed={collapsed} onOpen={() => { setVisible(true) }} onClose={() => { setVisible(false) }} style={{ position: 'absolute', bottom: '20px' }}></ConsoleButton>
+        <TerminalButton collapsed={collapsed} visible={visible} onOpen={() => { setVisible(true) }} onClose={() => { setVisible(false) }} style={{ position: 'absolute', bottom: '20px' }}></TerminalButton>
       </Sider>
       <Layout>
         <Content><Outlet /></Content>
       </Layout>
-      <Console visible={visible} style={{ left: 12 + width, bottom: 14 }}></Console>
+      <Terminal visible={visible} onClose={() => { setVisible(false) }} style={{ left: 12 + width, bottom: 14 }}></Terminal>
     </Layout>
   )
 }

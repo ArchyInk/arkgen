@@ -3,7 +3,7 @@
  * @author: Archy
  * @Date: 2022-02-21 16:46:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-03-02 16:54:56
+ * @LastEditTime: 2022-03-03 09:55:59
  * @FilePath: \arkgen\server\src\websocket\console.ts
  * @description:
  */
@@ -43,36 +43,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var ws_1 = require("ws");
-var execa_1 = __importDefault(require("execa"));
-var iconv_lite_1 = __importDefault(require("iconv-lite"));
+var utils_1 = require("../shared/utils");
 exports.default = (function (server) {
     var wss = new ws_1.WebSocketServer({ server: server, path: '/console' });
     wss.on('connection', function connection(ws) {
         var _this = this;
         ws.on('message', function (data) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, stdout, stderr, result;
+            var _a, stdout, stderr;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         ws.send(data.toString());
-                        return [4 /*yield*/, execa_1.default.command("echo 测试", { encoding: 'binary' })];
+                        return [4 /*yield*/, (0, utils_1.execaShims)(data.toString())];
                     case 1:
                         _a = _b.sent(), stdout = _a.stdout, stderr = _a.stderr;
-                        console.log("stdout:".concat(stdout));
-                        result = iconv_lite_1.default.decode(Buffer.from(stdout, 'binary'), 'cp936');
-                        // const error = iconv.decode(Buffer.from(stderr, 'binary'), 'cp936')
-                        // console.log('result:');
-                        // console.log(result);
-                        // console.log('error:');
-                        // console.log(error);
-                        console.log(result);
-                        result.split(/\r?\n/).map(function (line) {
-                            console.log(line);
+                        stdout.split(/\r?\n/).map(function (line) {
+                            ws.send(line);
+                        });
+                        stderr.split(/\r?\n/).map(function (line) {
                             ws.send(line);
                         });
                         return [2 /*return*/];

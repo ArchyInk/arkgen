@@ -3,7 +3,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-28 10:45:22
+ * @LastEditTime: 2022-03-03 10:07:09
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -58,12 +58,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findViteConfig = exports.findPkg = exports.findFileAsync = exports.dirDetail = exports.pathType = exports.isExist = exports.isFile = exports.isDir = void 0;
+exports.execaShims = exports.removeDblquo = exports.findViteConfig = exports.findPkg = exports.findFileAsync = exports.dirDetail = exports.pathType = exports.isExist = exports.isFile = exports.isDir = void 0;
 var fs_extra_1 = require("fs-extra");
 var path_1 = require("path");
 var constants_1 = require("./constants");
 var nanomatch_1 = __importDefault(require("nanomatch"));
 var find_up_1 = __importDefault(require("find-up"));
+var execa_1 = __importDefault(require("execa"));
+var iconv_lite_1 = __importDefault(require("iconv-lite"));
 /**
  * @description: 判断路径是否为目录
  * @param {string} path
@@ -317,3 +319,30 @@ var findViteConfig = function () { return __awaiter(void 0, void 0, void 0, func
     });
 }); };
 exports.findViteConfig = findViteConfig;
+/**
+ * @description: 删除字符串首尾双引号
+ * @param {string} strs
+ * @return {*}
+ */
+var removeDblquo = function (strs) { return strs.substring(0, strs.length); };
+exports.removeDblquo = removeDblquo;
+/**
+ * @description: 解决exec显示中文会乱码的问题
+ * @param {*} cmd string 命令
+ * @return {*}
+ */
+var execaShims = function (cmd) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, stdout, stderr;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0: return [4 /*yield*/, execa_1.default.command(cmd, { encoding: 'binary' })];
+            case 1:
+                _a = _b.sent(), stdout = _a.stdout, stderr = _a.stderr;
+                return [2 /*return*/, {
+                        stdout: iconv_lite_1.default.decode(Buffer.from((0, exports.removeDblquo)(stdout), 'binary'), 'cp936'),
+                        stderr: iconv_lite_1.default.decode(Buffer.from((0, exports.removeDblquo)(stderr), 'binary'), 'cp936')
+                    }];
+        }
+    });
+}); };
+exports.execaShims = execaShims;

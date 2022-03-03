@@ -54,7 +54,8 @@
     "react-router-dom": "6",
     "react-syntax-highlighter": "^15.4.5",
     "recoil": "^0.6.1",
-    "ws": "^8.5.0"
+    "ws": "^8.5.0",
+    "xterm": "^4.18.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.16.5",

@@ -2,14 +2,13 @@
  * @author: Archy
  * @Date: 2022-02-21 16:46:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-03-02 16:54:56
+ * @LastEditTime: 2022-03-03 09:55:59
  * @FilePath: \arkgen\server\src\websocket\console.ts
  * @description: 
  */
 
 import { WebSocketServer } from 'ws';
-import execa from 'execa';
-import iconv, { encode } from 'iconv-lite'
+import { execaShims } from '../shared/utils';
 
 export default (server: any) => {
   const wss = new WebSocketServer({ server, path: '/console' })
@@ -17,17 +16,12 @@ export default (server: any) => {
   wss.on('connection', function connection(ws) {
     ws.on('message', async (data) => {
       ws.send(data.toString())
-      const { stdout, stderr } = await execa.command("echo 测试", { encoding: 'binary' })
-      console.log(`stdout:${stdout}`);
-      const result = iconv.decode(Buffer.from(stdout, 'binary'), 'cp936')
-      // const error = iconv.decode(Buffer.from(stderr, 'binary'), 'cp936')
-      // console.log('result:');
-      // console.log(result);
-      // console.log('error:');
-      // console.log(error);
-      console.log(result);
-      result.split(/\r?\n/).map((line) => {
-        console.log(line);
+      const { stdout, stderr } = await execaShims(data.toString())
+      stdout.split(/\r?\n/).map((line) => {
+        ws.send(line)
+      })
+
+      stderr.split(/\r?\n/).map((line) => {
         ws.send(line)
       })
     });

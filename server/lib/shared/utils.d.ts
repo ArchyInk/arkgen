@@ -58,3 +58,18 @@ export declare const findViteConfig: () => Promise<{
     hasViteConfig: boolean;
     viteConfig?: string;
 }>;
+/**
+ * @description: 删除字符串首尾双引号
+ * @param {string} strs
+ * @return {*}
+ */
+export declare const removeDblquo: (strs: string) => string;
+/**
+ * @description: 解决exec显示中文会乱码的问题
+ * @param {*} cmd string 命令
+ * @return {*}
+ */
+export declare const execaShims: (cmd: string) => Promise<{
+    stdout: string;
+    stderr: string;
+}>;

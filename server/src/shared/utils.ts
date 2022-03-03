@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-02-28 10:45:22
+ * @LastEditTime: 2022-03-03 10:07:09
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -20,6 +20,8 @@ import { join, extname } from 'path'
 import { CWD } from './constants'
 import nm from 'nanomatch'
 import findUp from 'find-up'
+import execa from 'execa'
+import iconv from 'iconv-lite'
 
 /**
  * @description: 判断路径是否为目录
@@ -187,4 +189,25 @@ export const findViteConfig = async () => {
     draft.viteConfig = viteConfig
   }
   return draft
+}
+
+/**
+ * @description: 删除字符串首尾双引号
+ * @param {string} strs
+ * @return {*}
+ */
+export const removeDblquo = (strs: string) => strs.substring(0, strs.length)
+
+/**
+ * @description: 解决exec显示中文会乱码的问题
+ * @param {*} cmd string 命令
+ * @return {*}
+ */
+export const execaShims = async (cmd: string) => {
+  const { stdout, stderr } = await execa.command(cmd, { encoding: 'binary' })
+
+  return {
+    stdout: iconv.decode(Buffer.from(removeDblquo(stdout), 'binary'), 'cp936'),
+    stderr: iconv.decode(Buffer.from(removeDblquo(stderr), 'binary'), 'cp936')
+  }
 }
