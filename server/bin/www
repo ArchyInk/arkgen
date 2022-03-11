@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-const wss = require('../lib/websocket/console.js').default
+const wss = require('../lib/websocket/terminal').default
 
 var app = require('../lib/app')
 var debug = require('debug')('server:server')
@@ -15,8 +15,6 @@ var http = require('http')
 
 var port = normalizePort(process.env.PORT || '4000')
 app.set('port', port)
-
-var wssPort = normalizePort(process.env.WSS_PORT || '4001')
 
 /**
  * Create HTTP server.

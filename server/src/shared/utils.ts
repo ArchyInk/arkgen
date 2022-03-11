@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-31 21:02:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-03-03 10:07:09
+ * @LastEditTime: 2022-03-10 15:28:11
  * @FilePath: \arkgen\server\src\shared\utils.ts
  * @description:
  */
@@ -196,15 +196,29 @@ export const findViteConfig = async () => {
  * @param {string} strs
  * @return {*}
  */
-export const removeDblquo = (strs: string) => strs.substring(0, strs.length)
+export const removeDblquo = (str: string) => str.substring(0, str.length)
+
+/**
+ * @description: 解决中文会乱码的问题
+ * @param {*}
+ * @return {*}
+ */
+export const transformEncode = (arg: string | Buffer) => {
+  if (typeof arg === 'string') {
+    return iconv.decode(Buffer.from(removeDblquo(arg), 'binary'), 'cp936')
+  } else if (arg instanceof Buffer) {
+    return iconv.decode(arg, 'cp936')
+  }
+}
+
 
 /**
  * @description: 解决exec显示中文会乱码的问题
  * @param {*} cmd string 命令
  * @return {*}
  */
-export const execaShims = async (cmd: string) => {
-  const { stdout, stderr } = await execa.command(cmd, { encoding: 'binary' })
+export const execaShims = async (cmd: string, cwd: string) => {
+  const { stdout, stderr } = await execa.command(cmd, { encoding: 'binary', cwd })
 
   return {
     stdout: iconv.decode(Buffer.from(removeDblquo(stdout), 'binary'), 'cp936'),

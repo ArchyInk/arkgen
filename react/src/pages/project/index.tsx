@@ -2,7 +2,7 @@
  * @Author: Archy
  * @Date: 2022-01-30 20:30:41
  * @LastEditors: Archy
- * @LastEditTime: 2022-03-02 14:57:35
+ * @LastEditTime: 2022-03-11 15:18:03
  * @FilePath: \arkgen\react\src\pages\project\index.tsx
  * @description: 
  */
@@ -13,7 +13,7 @@ import { getProjectInfo, getDir, getFile, getTaskList, getDependenceList } from 
 import type { DirType, ProjectInfo, TaskListType, DependenceList } from "../../api/project"
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { vs2015 } from 'react-syntax-highlighter/dist/esm/styles/hljs'
-import { LinkOutlined } from '@ant-design/icons'
+import { useCmd } from "../../hooks/useCmd";
 const { DirectoryTree } = Tree
 
 import './index.less'
@@ -26,6 +26,7 @@ const Project: React.FC = () => {
   const [taskList, setTaskList] = useState<TaskListType[]>([])
   const [dependenceList, setDependenceList] = useState<DependenceList[]>([])
   const cardHeaderStyle: React.CSSProperties = { display: 'flex', height: '3rem', alignItems: 'center' }
+  const runCmd = useCmd()
   const handleProjectInfo = async () => {
     const result = await getProjectInfo()
     if (result.success) {
@@ -204,20 +205,33 @@ const Project: React.FC = () => {
         tab: '依赖列表',
       },
     ]
+
+    const runTask = (cmd: any) => {
+      console.log(cmd);
+      runCmd(cmd)
+    }
     const contentList: Record<string, JSX.Element> = {
       taskList: <List
         style={{ padding: '0 16px' }}
         size="large"
         bordered
         dataSource={taskList}
-        renderItem={item => <List.Item style={itemStyle}><div>{item.name}</div><Button>运行</Button></List.Item>}
+        renderItem={item =>
+        (<List.Item key={item.name} style={itemStyle}>
+          <div>
+            <div>{item.name}</div>
+            <div style={{ fontSize: '12px', color: 'gray' }}>{item.description}</div>
+          </div>
+          <Button onClick={() => { runTask(item.name) }}>运行</Button>
+        </List.Item>)}
       />,
       dependenceList:
         <Card >
           {dependenceList.map((item) =>
           (
-            <Card.Grid style={gridStyle} onClick={(e) => { openNpm(item.name) }}>
-              {item.name}
+            <Card.Grid style={gridStyle} key={item.name} onClick={(e) => { openNpm(item.name) }}>
+              <div>{item.name}</div>
+              <div>{item.version}</div>
             </Card.Grid>
           ))
           }

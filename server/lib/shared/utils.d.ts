@@ -63,13 +63,19 @@ export declare const findViteConfig: () => Promise<{
  * @param {string} strs
  * @return {*}
  */
-export declare const removeDblquo: (strs: string) => string;
+export declare const removeDblquo: (str: string) => string;
+/**
+ * @description: 解决中文会乱码的问题
+ * @param {*}
+ * @return {*}
+ */
+export declare const transformEncode: (arg: string | Buffer) => string;
 /**
  * @description: 解决exec显示中文会乱码的问题
  * @param {*} cmd string 命令
  * @return {*}
  */
-export declare const execaShims: (cmd: string) => Promise<{
+export declare const execaShims: (cmd: string, cwd: string) => Promise<{
     stdout: string;
     stderr: string;
 }>;

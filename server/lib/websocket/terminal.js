@@ -3,8 +3,8 @@
  * @author: Archy
  * @Date: 2022-02-21 16:46:37
  * @LastEditors: Archy
- * @LastEditTime: 2022-03-10 10:25:23
- * @FilePath: \arkgen\server\src\websocket\console.ts
+ * @LastEditTime: 2022-03-10 15:49:58
+ * @FilePath: \arkgen\server\src\websocket\terminal.ts
  * @description:
  */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -43,49 +43,70 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var ws_1 = require("ws");
+var pretty_error_1 = __importDefault(require("pretty-error"));
+var pe = new pretty_error_1.default();
 var utils_1 = require("../shared/utils");
+var execa_1 = __importDefault(require("execa"));
+var constants_1 = require("../shared/constants");
+var path_1 = require("path");
+var Cwd = /** @class */ (function () {
+    function Cwd() {
+        this._cwd = constants_1.CWD;
+    }
+    Object.defineProperty(Cwd.prototype, "cwd", {
+        get: function () {
+            return this._cwd;
+        },
+        set: function (_cwd) {
+            this._cwd = _cwd;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return Cwd;
+}());
 exports.default = (function (server) {
     var wss = new ws_1.WebSocketServer({ server: server, path: '/terminal' });
-    var over = function (ws) {
-        ws.send('message over');
-    };
+    var cwd = new Cwd();
+    var child = null;
     wss.on('connection', function (ws) {
-        ws.send('connect success!');
-        over(ws);
+        ws.send("cwdchange&".concat(cwd.cwd));
+        ws.send('PROMPT');
         ws.on('message', function (data) { return __awaiter(void 0, void 0, void 0, function () {
-            var _a, stdout, stderr, err_1, stderr, _stderr;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _b.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, (0, utils_1.execaShims)(data.toString())];
-                    case 1:
-                        _a = _b.sent(), stdout = _a.stdout, stderr = _a.stderr;
-                        stdout.split(/\r?\n/).map(function (line) {
-                            ws.send(line);
-                        });
-                        stderr.split(/\r?\n/).map(function (line) {
-                            ws.send(line);
-                        });
-                        return [3 /*break*/, 3];
-                    case 2:
-                        err_1 = _b.sent();
-                        stderr = err_1.stderr;
-                        _stderr = (0, utils_1.transformEncode)(stderr);
-                        _stderr.split(/\r?\n/).map(function (line) {
-                            ws.send(line);
-                        });
-                        return [3 /*break*/, 3];
-                    case 3:
-                        ws.send('message over');
-                        return [2 /*return*/];
+            var stderr;
+            return __generator(this, function (_a) {
+                try {
+                    child = execa_1.default.command(data.toString(), { encoding: 'binary', cwd: cwd.cwd, stdio: ['inherit', 'pipe', 'pipe'], });
+                    if (data.toString().split(' ')[0].toLocaleLowerCase() === 'cd') {
+                        cwd.cwd = (0, path_1.join)(cwd.cwd, data.toString().split(' ')[1]);
+                        ws.send("cwdchange&".concat(cwd.cwd));
+                    }
+                    child.stdout.on('data', function (buffer) {
+                        ws.send((0, utils_1.transformEncode)(buffer));
+                    });
+                    child.stderr.on('data', function (buffer) {
+                        ws.send((0, utils_1.transformEncode)(buffer));
+                    });
+                    child.on('exit', function () {
+                        ws.send('PROMPT');
+                    });
                 }
+                catch (err) {
+                    stderr = (0, utils_1.transformEncode)(pe.render(err));
+                    ws.send(stderr);
+                }
+                return [2 /*return*/];
             });
         }); });
         ws.on('close', function () {
-            ws.send;
+            cwd.cwd = constants_1.CWD;
+            child && child.cancel();
+            ws.send('connect close...');
         });
     });
 });
